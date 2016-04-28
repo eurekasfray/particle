@@ -1,0 +1,188 @@
+----------------------------------------------------------------
+    1 INTRODUCTION
+----------------------------------------------------------------
+  
+    1.1 GOALS
+   
+1   My goal is to develop a simple and useable programming
+    language whose core concept is based the ideas behind
+    assembly languages. The language should allow a programmer
+    to build a program using basic data types such as bytes,
+    words and doubles words by manipulating data. Let's see
+    the possibilities.
+ 
+----------------------------------------------------------------
+    2 DESIGN
+----------------------------------------------------------------
+
+    2.1 BASICS
+
+1   The constructs of the language are designed to statisfy
+    the following requirements:
+
+    The goal is to make the language Turing-complete.
+    To do this, the language will need:
+     
+    Control-flow constructs.   
+   
+    Storage manipulation: the ability to write/read values
+    to/from objects, and the ability to get the address of an
+    object.
+       
+    A similarity to assembly:
+    Direct addressing. In assembly a programmer can write
+    directly to memory by a instruction such as
+    `mov [0xA000],100`. The language's assignment
+    statement should fascilate direct addressing like
+    `0xA000 = 100`.
+
+----------------------------------------------------------------
+    3 CONCEPTS
+----------------------------------------------------------------
+
+    3.1 BASICS
+
+1   This part introduces the basic concepts of the programming
+    language.
+
+2   An *entity* is a value or object.
+
+3   A *value* is an expression that cannot be evaluated
+    further.
+
+4   An *lvalue* is a value that points to an address in
+    memory.
+
+5   An *object* is a location in memory. An object is either
+    a variable or function.
+
+6   A *variable* is a storage location. (A variable shall
+    have an lvalue and rvalue)?. (Access to a variable's
+    lvalue and rvalue is associated with the variable's
+    identifier)?.
+
+7   A *storage element* is a single unit of storage for
+    a variable. A variable can have one or more storage
+    elements. Storage elements of an object are stored
+    in contiguous sequence in memory. When an identifier
+    is declared, the lvalue and rvalue of the variable
+    are associated with the first storage element.
+
+6   A *function* is a location of a unit of instructions.
+
+8   An *identifier* is a name used to identify an object.
+
+9   A *type* determines the meaning of each storage element of
+    an object. There are four types: `byte`, `word`, `dword`,
+    and `void`.
+
+10  A variable declared as `byte` can store 8 bits of data.
+    This is the smallest unit of data. It occupies one cell of
+    memory. For the declared object, each storage element is
+    interpreted as units of 8 bits of data.
+    
+11  A variable declared as `word` can store 16 bits (or 2 bytes)
+    of data. It is the size of the data path of the machine.
+    It occupies two cells of memory. For the declared object,
+    each of the object's storage element is interpreted as units
+    of 16 bits of data.
+
+12  A variable declared as `dword` (double word) can store
+    32 bits (or double the size of a word). It occupies four
+    cells of memory. For the declared object, each of the
+    object's storage element is interpreted as units of
+    32 bits of data.
+
+13  A variable declared as `void` does carries an empty value.
+    For the declared object, there is no storage element and
+    the object is interpreted as incomplete (why?).
+
+    3.2 DECLARATIONS
+
+1   A declaration specifies how identifiers are interpreted.
+
+    3.3 DECLARATORS
+
+1   A declarator specifies the identifier of an object under
+    a declaration. 
+
+2   A *variable declarator* specifies the identifier and the
+    number of the storage element(s) for a variable, and causes
+    storage to be reserved for that variable.
+
+3   A *function declarator* specifies the identifier and formal
+    parameters of a function.
+
+    3.4 Initializer
+
+1   A declarator can specify the initial value(s) of the
+    identifier being declared.
+
+2   The initializers of an identifier of a variable declares the
+    initial values of each storage element of a variable.
+
+    3.5 Definition
+
+1   The definition of a function includes the function body.
+
+
+----------------------------------------------------------------
+    4 EXPRESSIONS
+----------------------------------------------------------------
+
+    4.1 UNARY OPERATORS
+
+1   The $ operator returns the size of its operand in bytes.
+    The operand shall only be a variable. The result of this
+    operation is a `word` value.
+
+2   The & operator returns the address of its operand as a `word`.
+    The operand shall be an identifier.
+
+3   The * operator treats its operand as an address and returns
+    the value stored at the address. The operand shall be an
+    expression.
+
+    4.x LITERALS
+
+1   The values `true`, `false`, and `null` are representations of
+    the integer values values 0 and 1. The `null` and `false`
+    numerals is a representation for the integer value 0.
+    The `true` value numerals is a representation for the integer
+    value 1.
+
+
+----------------------------------------------------------------
+    5 STATEMENTS
+----------------------------------------------------------------
+
+1   The expression statement TBD
+
+2   The `if` statement TBD
+
+3   The `while` statement TBD
+
+4   The `for` statement TBD
+
+5   The `break` statement TBD
+
+6   The `continue` statement TBD
+
+7   The 'return' statement TBD
+
+8   The `next` statement TBD
+
+
+----------------------------------------------------------------
+    6 BUILT-IN FUNCTIONS
+----------------------------------------------------------------
+
+1   The `get()` . This is the prototype: `byte get(void)`.
+    It takes no arguments and returns a `byte` value. TBD
+
+2   The `put()` . This is the prototype: `void out(byte)`. TBD
+
+3   The `malloc()` . This is the prototype: `word malloc(word)`.
+    It takes a `word` argument abd returns a `word` argument. TBD
+
+4   The `free()` . This is the prototype: `void free(word)`. TBD
