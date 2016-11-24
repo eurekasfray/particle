@@ -51,7 +51,7 @@
 
 * A *variable* is a storage location. (A variable shall have an lvalue and rvalue)?. (Access to a variable's lvalue and rvalue is associated with the variable's identifier)?.
 
-* A *storage element* is a single unit of storage for a variable. A storage element is a contiguous sequence of cells in memory that's treated as a unit. A variable can have one or more storage elements. The storage elements of an object are stored in contiguous sequence in memory. When an identifier is declared, the lvalue and rvalue of the variable are associated with the first (or zeroeth) storage element.
+* A *storage element* is a unit of storage. It is a contiguous sequence of cells in memory that is treated as a unit of data. A variable can have zero or more storage elements. Storage elements are stored as a contiguous sequence in memory. The first storage element in the sequence is called the *zeroeth element*. When an identifier is declared, the lvalue and rvalue of the variable are associated with the first (or zeroeth) storage element.
 
 * A *function* is a location of a unit of instructions.
 
