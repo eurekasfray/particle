@@ -6,7 +6,7 @@
 
 * The style of this document was inspired by [Dick's November 1996 Working Paper C++ standards draft](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
 
-### Goals
+## Goals
 
 * My aim goal is to develop a simple and useable programming language whose core concept is based the ideas behind the assembly languages (x86 especially). The language should allow a programmer to build a program using basic data types such as bytes, words and doubles words by manipulating data. Let's see the possibilities.
 
@@ -36,44 +36,44 @@
 
 # Lexical conventions
 
-### Character set
+## Character set
 
 * A legal program only contain only the characters specified by the character set.
 
-**Source encoding**
+### Source encoding
 
 * The encoding of the input source is 7-bit ASCII.
 
-**Alphabets**
-
-Uppercase characters
+### Alphabets
 
 ```
+Uppercase characters
+
 A  B  C  D  E  F  G  H  I  J  K  L  M
 N  O  P  Q  R  S  T  U  V  W  X  Y  Z
 ```
 
+```
 Lowercase characters
 
-```
 a  b  c  d  e  f  g  h  i  j  k  l  m
 n  o  p  q  r  s  t  u  v  w  x  y  z
 ```
 
+```
 Symbol character
 
-```
 _   underscore
 ```
 
-**Digits**
+### Digits
 
 ```
 0  1  2  3  4  5  6  7  8  9
 ```
 
 
-**Special characters**
+### Special characters
 
 ```
 +   plus sign           /   division sign           %   percentage sign
@@ -93,7 +93,7 @@ _   underscore
 @   at sign
 ```
 
-**Whitespace characters**
+### Whitespace characters
 
 ```
 \n  newline             \r  carriage return         \v  vertical tab
@@ -103,21 +103,21 @@ _   underscore
 \'  single quote        \"  double quote
 ```
 
-**Execution characters**
+### Execution characters
 
 ```
 [Put escape characters here]
 ```
 
-### Translation phases
+## Translation phases
 
 TBD
 
-### Keywords
+## Keywords
 
 TBD
 
-### Token
+## Token
 
 * A token is a unit of characters. Whitespace characters are used to delimit tokens. The lexical analyzer ignores whitespace characters entirely.
 
@@ -125,14 +125,14 @@ TBD
 
 * Apart from the above, other tokens include EOF, char.
 
-### Comments
+## Comments
 
 * A comment is ignored entirely by the compiler. The compiler does not tokenize a comment. A comment is initiated by the hash character ('#') and is terminated by either NEWLINE or EOF. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
 
 
 # Concepts
 
-### Basics
+## Basics
 
 * This part introduces the basic concepts of the programming language.
 
@@ -167,7 +167,7 @@ TBD
 
 * A *declaration* specifies how identifiers are interpreted.
 
-### Declarators
+## Declarators
 
 * A *declarator* specifies the identifier of an object under a declaration.
 
@@ -175,20 +175,20 @@ TBD
 
 * A *function declarator* specifies the identifier and formal parameters of a function.
 
-### Initializer
+## Initializer
 
 * A declarator can specify the initial value(s) of the identifier being declared.
 
 * The initializers of an identifier for a variable declares the initial values of each storage element of a variable.
 
-### Definition
+## Definition
 
 * The definition of a function includes the function body.
 
 
 # Expressions
 
-### Unary operators
+## Unary operators
 
 * The `$` operator returns the size of its operand in bytes. The operand of this operator must only be a variable. The result of this operation is a `word` value.
 
@@ -196,49 +196,49 @@ TBD
 
 * The `*` operator treats its operand as an address and returns the value stored at the address. The operand shall be an expression.
 
-### Literals
+## Literals
 
 * The values `true`, `false`, and `null` are representations of the integer values values `0` and `1`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
 
 
 # Statements
 
-### Expression statement
+## Expression statement
 
 TBD
 
-### The `if` statement
+## The `if` statement
 
 TBD
 
-### The `while` statement
+## The `while` statement
 
 TBD
 
-### The `for` statement
+## The `for` statement
 
 TBD
 
-### The `break` statement
+## The `break` statement
 
 TBD
 
-### The `continue` statement
+## The `continue` statement
 
 TBD
 
-### The `return` statement
+## The `return` statement
 
 TBD
 
-### The `next` statement
+## The `next` statement
 
 TBD
 
 
 # Built-in functions
 
-### The `get` function
+## The `get` function
 
 * The `get()` reads a character from the input stream.
 
@@ -248,7 +248,7 @@ TBD
 
 * TBD
 
-### The `put()` function
+## The `put()` function
 
 * The `put()` outputs a character to the output stream.
 
@@ -256,7 +256,7 @@ TBD
 
 * TBD
 
-### The `malloc()` function
+## The `malloc()` function
 
 * The `malloc()` TBD
 
@@ -264,7 +264,7 @@ TBD
 
 * The function takes a `word` argument and returns a `word` argument.
 
-### The `free()` function
+## The `free()` function
 
 * The `free()` TBD 
 
