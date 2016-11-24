@@ -4,7 +4,7 @@
 
 * This document is the specification for the Particle programming language.
 
-* The style of this document was inspired by the C++ specification (<http://www.csci.csusb.edu/dick/c++std/cd2/index.html>). Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
+* The style of this document was inspired by [Dick's November 1996 Working Paper C++ standards draft](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
 
 ## Goals
 
@@ -30,14 +30,14 @@
   N  O  P  Q  R  S  T  U  V  W  X  Y  Z
   ```
 
-* Lowercase characters:
+* Lowercase characters
 
   ```
   a  b  c  d  e  f  g  h  i  j  k  l  m
   n  o  p  q  r  s  t  u  v  w  x  y  z
   ```
 
-* Symbol character:
+* Symbol character
 
   ```
   _   underscore
@@ -45,14 +45,18 @@
 
 ### Digits
 
-* ```
+* Digits
+
+  ```
   0  1  2  3  4  5  6  7  8  9
   ```
 
 
 ### Special characters
 
-* ```
+* Special characters
+
+  ```
   +   plus sign           /   division sign           %   percentage sign
 
   -   minus sign          *   multiplication sign     &   ampersand
@@ -72,7 +76,9 @@
 
 ### Whitespace characters
 
-* ```
+* Whitespace charactes
+
+  ```
   \n  newline             \r  carriage return         \v  vertical tab
 
   \t  horizontal tab      \0  null                    \b  blank space
@@ -82,7 +88,9 @@
 
 ### Execution characters
 
-* ```
+* Execution characters
+
+  ```
   [Put escape characters here]
   ```
 
