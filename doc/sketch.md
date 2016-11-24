@@ -95,7 +95,7 @@
 
 ## Unary operators
 
-* The `$` operator returns the size of its operand in bytes. The operand shall only be a variable. The result of this operation is a `word` value.
+* The `$` operator returns the size of its operand in bytes. The operand of this operator must only be a variable. The result of this operation is a `word` value.
 
 * The `&` operator returns the address of its operand as a `word`. The operand shall be an identifier.
 
@@ -108,21 +108,37 @@
 
 # Statements
 
-* The expression statement TBD
+## Expression statement
 
-* The `if` statement TBD
+TBD
 
-* The `while` statement TBD
+## The `if` statement
 
-* The `for` statement TBD
+TBD
 
-* The `break` statement TBD
+## The `while` statement
 
-* The `continue` statement TBD
+TBD
 
-* The `return` statement TBD
+## The `for` statement
 
-* The `next` statement TBD
+TBD
+
+## The `break` statement
+
+TBD
+
+## The `continue` statement
+
+TBD
+
+## The `return` statement
+
+TBD
+
+## The `next` statement
+
+TBD
 
 
 # Built-in functions
