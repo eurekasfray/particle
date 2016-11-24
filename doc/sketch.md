@@ -140,7 +140,7 @@ TBD
 
 * A *value* is an expression that cannot be evaluated further.
 
-* An *lvalue* is a value that points to an address in memory.
+* An *lvalue* is an expression that points to an address in memory.
 
 * An *object* is a location in memory. An object is either a variable or function.
 
