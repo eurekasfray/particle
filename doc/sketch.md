@@ -4,11 +4,107 @@
 
 * This document is the specification for the Particle programming language.
 
-* The style of this document was inspired by the C++ specification <http://www.csci.csusb.edu/dick/c++std/cd2/index.html>. Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
+* The style of this document was inspired by the C++ specification (<http://www.csci.csusb.edu/dick/c++std/cd2/index.html>). Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
 
 ## Goals
 
 * My aim goal is to develop a simple and useable programming language whose core concept is based the ideas behind the assembly languages (x86 especially). The language should allow a programmer to build a program using basic data types such as bytes, words and doubles words by manipulating data. Let's see the possibilities.
+
+
+# Lexicon
+
+## Character set
+
+* A legal program only contain only the characters specified by the character set.
+
+### Source encoding
+
+* The encoding of the input source is 7-bit ASCII.
+
+### Alphabets
+
+* Uppercase characters
+
+  ```
+  A  B  C  D  E  F  G  H  I  J  K  L  M
+  N  O  P  Q  R  S  T  U  V  W  X  Y  Z
+  ```
+
+* Lowercase characters:
+
+  ```
+  a  b  c  d  e  f  g  h  i  j  k  l  m
+  n  o  p  q  r  s  t  u  v  w  x  y  z
+  ```
+
+* Symbol character:
+
+  ```
+  _   underscore
+  ```
+
+### Digits
+
+* ```
+  0  1  2  3  4  5  6  7  8  9
+  ```
+
+
+### Special characters
+
+* ```
+  +   plus sign           /   division sign           %   percentage sign
+
+  -   minus sign          *   multiplication sign     &   ampersand
+
+  |   vertical bar        (   left parenthesis        )   right parenthesis
+
+  {   left curly bracket  }   right curly bracket     ,   comma
+
+  :   colon               ;   semicolon               =   equal sign
+
+  <   left-than sign      >   greater-than sign       !   exclamation mark
+
+  ~   tilde               ^   caret                   #   hash/pound sign
+
+  @   at sign
+  ```
+
+### Whitespace characters
+
+* ```
+  \n  newline             \r  carriage return         \v  vertical tab
+
+  \t  horizontal tab      \0  null                    \b  blank space
+
+  \'  single quote        \"  double quote
+  ```
+
+### Execution characters
+
+* ```
+  [Put escape characters here]
+  ```
+
+## Translation phases
+
+TBD
+
+## Keywords
+
+TBD
+
+## Token
+
+* A token is a unit of characters. Whitespace characters are used to delimit tokens. The lexical analyzer ignores whitespace characters entirely.
+
+* Tokens are groups into [number] classes.
+
+* Apart from the above, other tokens include EOF, char.
+
+## Comments
+
+* A comment is ignored entirely by the compiler. The compiler does not tokenize a comment. A comment is initiated by the hash character ('#') and is terminated by either NEWLINE or EOF. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
 
 
 # Design
