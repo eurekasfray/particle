@@ -8,7 +8,7 @@
 
 ## Goals
 
-* My aim goal is to develop a simple and useable programming language whose core concept is based the ideas behind the assembly languages (x86 especially). The language should allow a programmer to build a program using basic data types such as bytes, words and doubles words by manipulating data. Let's see the possibilities.
+* My aim goal is to develop a simple, useable programming language whose core concept is based the ideas behind the assembly languages (x86 specifically). The language shall allow a programmer to build a program using three basic data types (bytes, words, and double words). Let's see the possibilities.
 
 
 # Design
@@ -119,7 +119,7 @@ TBD
 
 ## Token
 
-* A token is a unit of characters. Whitespace characters are used to delimit tokens. The lexical analyzer ignores whitespace characters entirely.
+* A token is a unit of characters. Whitespace characters shall delimit tokens. The lexical analyzer ignores whitespace characters entirely.
 
 * Tokens are groups into [number] classes.
 
@@ -127,7 +127,7 @@ TBD
 
 ## Comments
 
-* A comment is ignored entirely by the compiler. The compiler does not tokenize a comment. A comment is initiated by the hash character ('#') and is terminated by either NEWLINE or EOF. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
+* A comment is ignored entirely by the compiler. The compiler does not tokenize a comment. A comment is initiated by the hash character (`#`) and is terminated by either NEWLINE or EOF. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
 
 
 # Concepts
