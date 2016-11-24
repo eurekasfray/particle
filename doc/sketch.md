@@ -38,11 +38,11 @@
 
 ## Character set
 
-* A legal program only contain only the characters specified by the character set.
+* A program shall only contain characters specified by the character set.
 
 ### Source encoding
 
-* The encoding of the input source is 7-bit ASCII.
+* The encoding of the input source shall support 7-bit ASCII, and shall not support any other encoding.
 
 ### Alphabets
 
