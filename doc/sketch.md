@@ -4,7 +4,7 @@
 
 * This document is the specification for the Particle programming language.
 
-* The style of this document was inspired by [Dick's November 1996 Working Paper C++ standards draft](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). concepts, ideas, and gotchas of the language are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
+* The style of this document was inspired by [Dick's November 1996 Working Paper C++ standards draft](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). Concepts, ideas, and gotchas of the language are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
 
 ## Goals
 
