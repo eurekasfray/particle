@@ -127,8 +127,8 @@ TBD
 
 ## Comments
 
-* A comment is initiated by the hash character (`#`) and is terminated by either the **newline** token or **eof** token.
-* A comment is ignored entirely by the compiler. The compiler does not tokenize a comment.  That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
+* A comment is initiated by the hash character (`#`) and is terminated by either the NEWLINE token or EOF token.
+* The translator shall not tokenize a comment. A comment is ignored entirely by the compiler. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
 
 
 # Concepts
