@@ -11,7 +11,30 @@
 * My aim goal is to develop a simple and useable programming language whose core concept is based the ideas behind the assembly languages (x86 especially). The language should allow a programmer to build a program using basic data types such as bytes, words and doubles words by manipulating data. Let's see the possibilities.
 
 
-# Lexicon
+# Design
+
+## Basics
+
+* The constructs of the language are designed to satisfy the following requirements:
+
+* Turing-complete. To do this, the language will need:
+  - Control-flow constructs:
+  - Storage manipulation: the ability to write/read values to/from objects, and the ability to get the address of an object.
+
+* A similarity to assembly:
+  - Direct addressing. In assembly a programmer can write directly to memory by a instruction such as
+
+    ```
+    mov [0xA000], 100
+    ```
+
+    The language's assignment statement should facilitate direct addressing like
+
+    ```
+    0xA000 = 100
+    ```
+
+# Lexical conventions
 
 ## Character set
 
@@ -113,30 +136,6 @@ TBD
 ## Comments
 
 * A comment is ignored entirely by the compiler. The compiler does not tokenize a comment. A comment is initiated by the hash character ('#') and is terminated by either NEWLINE or EOF. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
-
-
-# Design
-
-## Basics
-
-* The constructs of the language are designed to satisfy the following requirements:
-
-* Turing-complete. To do this, the language will need:
-  - Control-flow constructs:
-  - Storage manipulation: the ability to write/read values to/from objects, and the ability to get the address of an object.
-
-* A similarity to assembly:
-  - Direct addressing. In assembly a programmer can write directly to memory by a instruction such as
-
-    ```
-    mov [0xA000], 100
-    ```
-
-    The language's assignment statement should facilitate direct addressing like
-
-    ```
-    0xA000 = 100
-    ```
 
 
 # Concepts
