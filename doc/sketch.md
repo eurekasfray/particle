@@ -70,11 +70,11 @@
 
 # Declarations
 
-* A declaration specifies how identifiers are interpreted.
+* A *declaration* specifies how identifiers are interpreted.
 
 ## Declarators
 
-* A declarator specifies the identifier of an object under a declaration.
+* A *declarator* specifies the identifier of an object under a declaration.
 
 * A *variable declarator* specifies the identifier and the number of the storage element(s) for a variable, and causes storage to be reserved for that variable.
 
@@ -103,7 +103,7 @@
 
 ## Literals
 
-* The values `true`, `false`, and `null` are representations of the integer values values 0 and 1. The `null` and `false` numerals is a representation for the integer value 0. The `true` value numerals is a representation for the integer value 1.
+* The values `true`, `false`, and `null` are representations of the integer values values `0` and `1`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
 
 
 # Statements
@@ -127,9 +127,21 @@
 
 # Built-in functions
 
-* The `get()` . This is the prototype: `byte get(void)`. It takes no arguments and returns a `byte` value. TBD
+* The `get()` reads a character from the input stream. The prototype of this function is as follows:
 
-* The `put()` . This is the prototype: `void out(byte)`. TBD
+  ```
+  byte get(void)
+  ```
+
+  It takes no arguments and returns a `byte` value. TBD
+
+* The `put()` outputs a character to the output stream. The prototype of this function is as follows:
+
+  ```
+  void out(byte)
+  ```
+
+  TBD
 
 * The `malloc()` . This is the prototype: `word malloc(word)`. It takes a `word` argument abd returns a `word` argument. TBD
 
