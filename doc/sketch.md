@@ -1,15 +1,15 @@
 # Particle spec
 
-# Introduction 
+# Introduction
 
 * This document is the specification for the Particle programming language.
 
-* The style of the document was inspired by the C++ specification (insert URL here). Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
-  
+* The style of this document was inspired by the C++ specification <http://www.csci.csusb.edu/dick/c++std/cd2/index.html>. Language's concepts, ideas, and gotchas are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
+
 ## Goals
-   
+
 * My aim goal is to develop a simple and useable programming language whose core concept is based the ideas behind the assembly languages (x86 especially). The language should allow a programmer to build a program using basic data types such as bytes, words and doubles words by manipulating data. Let's see the possibilities.
- 
+
 
 # Design
 
@@ -22,12 +22,22 @@
   - Storage manipulation: the ability to write/read values to/from objects, and the ability to get the address of an object.
 
 * A similarity to assembly:
-  - Direct addressing. In assembly a programmer can write directly to memory by a instruction such as `mov [0xA000],100`. The language's assignment statement should facilitate direct addressing like `0xA000 = 100`.
+  - Direct addressing. In assembly a programmer can write directly to memory by a instruction such as
+
+    ```
+    mov [0xA000], 100
+    ```
+
+    The language's assignment statement should facilitate direct addressing like
+
+    ```
+    0xA000 = 100
+    ```
 
 
-# Concepts 
+# Concepts
 
-## Basics 
+## Basics
 
 * This part introduces the basic concepts of the programming language.
 
@@ -50,7 +60,7 @@
 * A *type* determines the meaning of each storage element of an object. There are four types: `byte`, `word`, `dword`, and `void`.
 
 * `byte`: A variable declared as `byte` can store 8 bits of data. This is the smallest unit of data. It occupies one cell of memory. For the declared object, each storage element is interpreted as units of 8 bits of data.
-    
+
 * `word`: A variable declared as `word` can store 16 bits (or 2 bytes) of data. It is the size of the data path of the machine. It occupies two contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 16 bits of data.
 
 * `dword`: A variable declared as `dword` (double word) can store 32 bits (or double the size of a word). It occupies four contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 32 bits of data.
@@ -58,13 +68,13 @@
 * `void`: A variable declared as `void` carries an empty value. The declared object has no storage element and the object is interpreted as incomplete (why?).
 
 
-# Declarations 
+# Declarations
 
 * A declaration specifies how identifiers are interpreted.
 
 ## Declarators
 
-* A declarator specifies the identifier of an object under a declaration. 
+* A declarator specifies the identifier of an object under a declaration.
 
 * A *variable declarator* specifies the identifier and the number of the storage element(s) for a variable, and causes storage to be reserved for that variable.
 
@@ -110,7 +120,7 @@
 
 * The `continue` statement TBD
 
-* The 'return' statement TBD
+* The `return` statement TBD
 
 * The `next` statement TBD
 
