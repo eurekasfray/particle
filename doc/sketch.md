@@ -6,22 +6,21 @@
 
 * The style of this document was inspired by [Dick's November 1996 Working Paper C++ standards draft](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). Concepts, ideas, and gotchas of the language are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
 
+# Design
+
 ## Goals
 
-* My aim goal is to develop a simple, useable programming language whose core concept is based the ideas behind the assembly languages (x86 specifically). The language shall allow a programmer to build a program using three basic data types (bytes, words, and double words). Let's see the possibilities.
-
-
-# Design
+* My goal is to develop a simple, useable programming language whose core concept is based the ideas behind the assembly languages (x86 specifically). The language shall allow a programmer to build a program using three basic data types (bytes, words, and double words). Let's see the possibilities.
 
 ## Basics
 
 * The constructs of the language are designed to satisfy the following requirements:
 
-* Turing-complete. To do this, the language will need:
+* 1) Turing-complete. To do this, the language will need:
   - Control-flow constructs:
   - Storage manipulation: the ability to write/read values to/from objects, and the ability to get the address of an object.
 
-* A similarity to assembly:
+* 2) A similarity to assembly:
   - Direct addressing. In assembly a programmer can write directly to memory by a instruction such as
 
     ```
@@ -119,15 +118,31 @@ TBD
 
 ## Token
 
-* A token is a unit of characters. Whitespace characters shall delimit tokens. The lexical analyzer ignores whitespace characters entirely.
+* A *token* is structure that represents a lexeme. A token provides the translator with basic information about its lexeme. The information a token provides shall include the following: 1) The *lexeme* which is a unit of characters. 2) The *type* which a unique value that is used to classify a lexeme. 3) The *int value* which stores the evaluated integer value of the lexeme if the token type is t_int. 4) The *string value* which stores the evaluated value of a string literal if the token type is either t_dqstr or t_sqstr. Other information a token may provide includes the following: 1) The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters a the translator encounters in the input stream. 2) The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
 
-* Tokens are groups into [number] classes.
+* Whitespace characters shall delimit tokens. The lexical analyzer ignores whitespace characters entirely.
 
-* Apart from the above, other tokens include EOF, char.
+* Tokens are groups into [insert number here] classes.
+
+* Apart from the above, other tokens include t_eof, t_char.
+
+* Tokenization is the process of recognizing lexemes and creating the appropriate token for the lexeme.
+
+* The translator shall recognize the following token types:
+
+  ```
+  t_int t_eof t_newline t_unknown
+  [ place token types here along side their syntax/pattern; meaning, what syntax makes t_int an int? ]
+  ```
+
+* If a type cannot recognization a matching type for a lexeme, then the lexeme shall be assigned the `t_unknown` type.
+
+* For a token whose type is `t_unknown` the translator shall raise an error to report the unknown lexeme.
 
 ## Comments
 
-* A comment is initiated by the hash character (`#`) and is terminated by either the NEWLINE token or EOF token.
+* A comment is initiated by the hash character (`#`) and is terminated by either the t_newline token or t_eof token.
+
 * The translator shall not tokenize a comment. A comment is ignored entirely by the compiler. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
 
 
@@ -141,7 +156,7 @@ TBD
 
 * A *value* is an expression that cannot be evaluated further.
 
-* An *lvalue* is an expression that points to an address in memory.
+* An *lvalue* is an expression that refers to an address in memory.
 
 * An *object* is a location in memory. An object is either a variable or function.
 
@@ -267,6 +282,6 @@ TBD
 
 ## The `free()` function
 
-* The `free()` TBD 
+* The `free()` TBD
 
 * The prototype of this function is as follows: `void free(word)`.
