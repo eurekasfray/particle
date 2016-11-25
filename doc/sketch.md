@@ -4,7 +4,7 @@
 
 * This document is the specification for the Particle programming language.
 
-* The style of this document was inspired by [Dick's November 1996 Working Paper C++ draft standards](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). The properties and behaviour of the constructs of the language are structured as lists. Each list item is called an article. Each article expresses a single concept, idea, or gotcha about the language with the good intention to enhance the reading experience with simple consumable concepts.
+* The style of this document was inspired by [Dick's November 1996 Working Paper C++ draft standards](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). The properties and behaviour of the constructs of the language are all written as lists. Each list item is called an article. Each article expresses a single concept, idea, or gotcha about the language with the good intention to enhance the reading experience with simple consumable concepts.
 
 # Design
 
