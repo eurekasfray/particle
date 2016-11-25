@@ -41,7 +41,7 @@
 
 ### Source encoding
 
-* The encoding of the input source shall support 7-bit ASCII, and shall not support any other encoding.
+* The encoding of the source shall support 7-bit ASCII, and shall not support any other encoding.
 
 ### Alphabets
 
@@ -118,7 +118,11 @@ TBD
 
 ## Token
 
-* A *token* is structure that represents a lexeme. A token provides the translator with basic information about its lexeme. The information a token provides shall include the following: 1) The *lexeme* which is a unit of characters. 2) The *type* which a unique value that is used to classify a lexeme. 3) The *int value* which stores the evaluated integer value of the lexeme if the token type is t_int. 4) The *string value* which stores the evaluated value of a string literal if the token type is either t_dqstr or t_sqstr. Other information a token may provide includes the following: 1) The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters a the translator encounters in the input stream. 2) The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
+* A *token* is a structure that represents a lexeme. A token provides the translator with basic information about its lexeme.
+
+* The information a token provides shall include the following: 1) The *lexeme* which is a unit of characters that is collected during the lexical analysis phase. 2) The *type* which a unique value that is used to classify a lexeme. 3) The *int value* which stores the evaluated integer value of the lexeme if the lexeme type is `t_int`. 4) The *string value* which stores the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
+
+* Other information a token may provide includes the following: 1) The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters the translator encounters each time it reads a character from the input source. 2) The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
 
 * Whitespace characters shall delimit tokens. The lexical analyzer ignores whitespace characters entirely.
 
@@ -131,11 +135,11 @@ TBD
 * The translator shall recognize the following token types:
 
   ```
-  t_int t_eof t_newline t_unknown
+  t_int t_eof t_newline t_unknown t_char
   [ place token types here along side their syntax/pattern; meaning, what syntax makes t_int an int? ]
   ```
 
-* If a type cannot recognization a matching type for a lexeme, then the lexeme shall be assigned the `t_unknown` type.
+* A lexeme shall be assigned the `t_unknown` type if the translator cannot recognize the lexeme by any other type.
 
 * For a token whose type is `t_unknown` the translator shall raise an error to report the unknown lexeme.
 
