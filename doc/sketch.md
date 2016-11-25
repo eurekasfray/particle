@@ -120,21 +120,21 @@ TBD
 
 * A *token* is a structure that represents a lexeme. A token provides the translator with basic information about its lexeme.
 
-* The information a token provides shall include the following: 1) lexeme, 2) type, 3) int value, and 5) string value.
+* The information a token provides shall include the following: lexeme, type, int value, and string value.
 
-* 1) The *lexeme* is a unit of characters that is collected during the lexical analysis phase.
+  * The *lexeme* is a unit of characters that is collected during the lexical analysis phase.
 
-* 2) The *type* is a unique value that is used to classify a lexeme.
+  * The *type* is a unique value that is used to classify a lexeme.
 
-* 3) The *int value* stores the evaluated integer value of the lexeme if the lexeme type is `t_int`.
+  * The *int value* stores the evaluated integer value of the lexeme if the lexeme type is `t_int`.
 
-* 4) The *string value* which stores the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
+  * The *string value* which stores the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
 
 * Other information a token may provide includes the following: line number, and column number.
 
-* 1) The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters the translator encounters each time it reads a character from the input source.
+  * The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters the translator encounters each time it reads a character from the input source.
 
-* 2) The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
+  * The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
 
 * Whitespace characters shall delimit tokens. The lexical analyzer ignores whitespace characters entirely.
 
