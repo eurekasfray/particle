@@ -230,7 +230,9 @@ TBD
 
 ## Literals
 
-* The values `true`, `false`, and `null` are representations of the integer values values `0` and `1`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
+* The integer literal `true` shall be interpreted as the integer value `1`.
+
+* The values `false` and `null` shall represent the integer values `0`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
 
 
 # Statements
