@@ -174,13 +174,13 @@ TBD
 
 * A *type* determines the meaning of each storage element of an object. There are four types: `byte`, `word`, `dword`, and `void`.
 
-* `byte`: A variable declared as `byte` can store 8 bits of data. This is the smallest unit of data. It occupies one cell of memory. For the declared object, each storage element is interpreted as units of 8 bits of data.
+* `byte`: A variable declared as `byte` shall store 8 bits of data. This is the smallest unit of data. It occupies one cell of memory. For the declared object, each storage element is interpreted as units of 8 bits of data.
 
-* `word`: A variable declared as `word` can store 16 bits (or 2 bytes) of data. It is the size of the data path of the machine. It occupies two contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 16 bits of data.
+* `word`: A variable declared as `word` shall store 16 bits (or 2 bytes) of data. It is the size of the data path of the machine. It occupies two contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 16 bits of data.
 
-* `dword`: A variable declared as `dword` (double word) can store 32 bits (or double the size of a word). It occupies four contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 32 bits of data.
+* `dword`: A variable declared as `dword` (double word) shall store 32 bits (or double the size of a word). It occupies four contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 32 bits of data.
 
-* `void`: A variable declared as `void` carries an empty value. The declared object has no storage element and the object is interpreted as incomplete (why?).
+* `void`: A variable declared as `void` shall carry an empty value. The declared object shall not have a storage element and the object shall be interpreted as incomplete (why?).
 
 
 # Declarations
