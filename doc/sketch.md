@@ -126,9 +126,9 @@ TBD
 
   * The *type* is a unique value that is used to classify a lexeme.
 
-  * The *int value* stores the evaluated integer value of the lexeme if the lexeme type is `t_int`.
+  * The *int value* shall store the evaluated integer value of the lexeme if the lexeme type is `t_int`.
 
-  * The *string value* which stores the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
+  * The *string value* shall store the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
 
 * Other information a token may provide includes the following: line number, and column number.
 
