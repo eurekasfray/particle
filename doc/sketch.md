@@ -6,6 +6,7 @@
 
 * The style of this document was inspired by [Dick's November 1996 Working Paper C++ draft standards](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). The properties and behaviour of the constructs of the language are all written as lists. Each item of the is called an article. Each article expresses a single concept, idea, or gotcha about the language with the good intention to enhance the reading experience with consumable concepts.
 
+
 # Design
 
 ## Goals
@@ -32,6 +33,7 @@
     ```
     0xA000 = 100
     ```
+
 
 # Lexical conventions
 
@@ -124,7 +126,7 @@ TBD
 
   * The *lexeme* is a unit of characters that is collected during the lexical analysis phase.
 
-  * The *type* is a unique value that is used to classify a lexeme.
+  * The *type* is a unique value that is used to define what a lexeme means. For example: 
 
   * The *int value* shall store the evaluated integer value of the lexeme if the lexeme type is `t_int`.
 
@@ -143,6 +145,8 @@ TBD
 * Apart from the above, other tokens include t_eof, t_char.
 
 * Tokenization is the process of recognizing lexemes and creating the appropriate token for the lexeme.
+
+## Token types
 
 * The translator shall recognize the following token types:
 
@@ -222,11 +226,11 @@ TBD
 
 ## Unary operators
 
-* The `$` operator returns the size of its operand in bytes. The operand of this operator must only be a variable. The result of this operation is a `word` value.
+* The `$` operator shall return the size of its operand in bytes. The operand of this operator shall only be a variable. The evaluated result of this operation shall be a `word` value.
 
-* The `&` operator returns the address of its operand as a `word`. The operand shall be an identifier.
+* The `&` operator shall return the address of its operand as a `word`. The operand shall be an identifier.
 
-* The `*` operator treats its operand as an address and returns the value stored at the address. The operand shall be an expression.
+* The `*` operator shall treat its operand as an address and returns the value stored at the address. The operand shall be an expression.
 
 ## Literals
 
