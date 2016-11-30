@@ -120,6 +120,8 @@ TBD
 
 ## Token
 
+* A *lexeme* is a unit of characters that is collected during the lexical analysis phase.
+
 * A *token* is a structure that represents a lexeme. A token provides the translator with basic information about its lexeme.
 
 * The information a token provides shall include the following: lexeme, type, int value, and string value.
