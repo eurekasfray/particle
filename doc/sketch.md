@@ -35,6 +35,11 @@
     ```
 
 
+# Translation phases
+
+TBD
+
+
 # Lexical conventions
 
 ## Character set
@@ -109,10 +114,6 @@ _   underscore
 ```
 [Put escape characters here]
 ```
-
-## Translation phases
-
-TBD
 
 ## Keywords
 
