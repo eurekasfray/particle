@@ -126,9 +126,9 @@ TBD
 
 * The information a token provides shall include the following: lexeme, type, int value, and string value.
 
-  * The *lexeme* is a unit of characters that is collected during the lexical analysis phase.
+  * The *lexeme* shall store the actual lexeme.
 
-  * The *type* is a unique value that is used to define what a lexeme means. For example: 
+  * The *type* shall store a unique value that represents the meaning of the lexeme. The unique value is used to define what the lexeme means.
 
   * The *int value* shall store the evaluated integer value of the lexeme if the lexeme type is `t_int`.
 
