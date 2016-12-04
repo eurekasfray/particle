@@ -4,7 +4,8 @@
 
 * This document is the specification for the Particle programming language.
 
-* The style of this document was inspired by [Dick's November 1996 Working Paper C++ standards draft](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). Concepts, ideas, and gotchas of the language are written as points called articles. Each article expresses a single idea about the programming language with the good intention to enhance the reading experience with simple consumable concepts.
+* The style of this document was inspired by [Dick's November 1996 Working Paper C++ draft standards](http://www.csci.csusb.edu/dick/c++std/cd2/index.html). The properties and behaviour of the constructs of the language are all written as lists. Each item of the is called an article. Each article expresses a single concept, idea, or gotcha about the language with the good intention to enhance the reading experience with consumable concepts.
+
 
 # Design
 
@@ -32,6 +33,12 @@
     ```
     0xA000 = 100
     ```
+
+
+# Translation phases
+
+TBD
+
 
 # Lexical conventions
 
@@ -108,21 +115,35 @@ _   underscore
 [Put escape characters here]
 ```
 
-## Translation phases
-
-TBD
-
 ## Keywords
 
 TBD
 
 ## Token
 
+* A *lexeme* is a unit of characters that is collected during the lexical analysis phase.
+
 * A *token* is a structure that represents a lexeme. A token provides the translator with basic information about its lexeme.
 
+<<<<<<< HEAD
 * The information a token provides shall include the following: 1) The *lexeme* which is a unit of characters that is collected during the lexical analysis phase. 2) The *type* which is a unique value that is used to classify a lexeme. 3) The *int value* which stores the evaluated integer value of the lexeme if the lexeme type is `t_int`. 4) The *string value* which stores the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
+=======
+* The information a token provides shall include the following: lexeme, type, int value, and string value.
 
-* Other information a token may provide includes the following: 1) The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters the translator encounters each time it reads a character from the input source. 2) The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
+  * The *lexeme* shall store the actual lexeme.
+
+  * The *type* shall store a unique value that represents the meaning of the lexeme. The unique value is used to define what the lexeme means.
+
+  * The *int value* shall store the evaluated integer value of the lexeme if the lexeme type is `t_int`.
+
+  * The *string value* shall store the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
+>>>>>>> fcedecadd144b1b35d6390a32b84c40252c9c271
+
+* Other information a token may provide includes the following: line number, and column number.
+
+  * The *line number* on which the token was collected by the translator. The line number should be maintained by keeping a count of the number of newline characters the translator encounters each time it reads a character from the input source.
+
+  * The *column number* on which the token was collected by the translator. The column number should be counted by counting each character read from the input stream. However, the counter shall be reset to the value `1` if the newline character is read.
 
 * Whitespace characters shall delimit tokens. The lexical analyzer ignores whitespace characters entirely.
 
@@ -131,6 +152,8 @@ TBD
 * Apart from the above, other tokens include t_eof, t_char.
 
 * Tokenization is the process of recognizing lexemes and creating the appropriate token for the lexeme.
+
+## Token types
 
 * The translator shall recognize the following token types:
 
@@ -174,13 +197,13 @@ TBD
 
 * A *type* determines the meaning of each storage element of an object. There are four types: `byte`, `word`, `dword`, and `void`.
 
-* `byte`: A variable declared as `byte` can store 8 bits of data. This is the smallest unit of data. It occupies one cell of memory. For the declared object, each storage element is interpreted as units of 8 bits of data.
+* `byte`: A variable declared as `byte` shall store 8 bits of data. This is the smallest unit of data. It occupies one cell of memory. For the declared object, each storage element is interpreted as units of 8 bits of data.
 
-* `word`: A variable declared as `word` can store 16 bits (or 2 bytes) of data. It is the size of the data path of the machine. It occupies two contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 16 bits of data.
+* `word`: A variable declared as `word` shall store 16 bits (or 2 bytes) of data. It is the size of the data path of the machine. It occupies two contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 16 bits of data.
 
-* `dword`: A variable declared as `dword` (double word) can store 32 bits (or double the size of a word). It occupies four contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 32 bits of data.
+* `dword`: A variable declared as `dword` (double word) shall store 32 bits (or double the size of a word). It occupies four contiguous cells of memory. For the declared object, each of the object's storage element is interpreted as units of 32 bits of data.
 
-* `void`: A variable declared as `void` carries an empty value. The declared object has no storage element and the object is interpreted as incomplete (why?).
+* `void`: A variable declared as `void` shall carry an empty value. The declared object shall not have a storage element and the object shall be interpreted as incomplete (why?).
 
 
 # Declarations
@@ -210,15 +233,17 @@ TBD
 
 ## Unary operators
 
-* The `$` operator returns the size of its operand in bytes. The operand of this operator must only be a variable. The result of this operation is a `word` value.
+* The `$` operator shall return the size of its operand in bytes. The operand of this operator shall only be a variable. The evaluated result of this operation shall be a `word` value.
 
-* The `&` operator returns the address of its operand as a `word`. The operand shall be an identifier.
+* The `&` operator shall return the address of its operand as a `word`. The operand shall be an identifier.
 
-* The `*` operator treats its operand as an address and returns the value stored at the address. The operand shall be an expression.
+* The `*` operator shall treat its operand as an address and returns the value stored at the address. The operand shall be an expression.
 
 ## Literals
 
-* The values `true`, `false`, and `null` are representations of the integer values values `0` and `1`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
+* The integer literal `true` shall be interpreted as the integer value `1`.
+
+* The values `false` and `null` shall represent the integer values `0`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
 
 
 # Statements
