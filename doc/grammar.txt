@@ -2,7 +2,7 @@
  * Written in EBNF
  * Date: 2015/11/07
  *}
- 
+
 keywords =
     "body" "byte" "def" "dword" "end" "entry" "get" "put" "var" "void" "word" ;
 
@@ -11,10 +11,10 @@ program =
     [var_block]
     {func_definition}
     EOF ;
-    
+
 entry_point_specifier =
     "entry" id ;
-    
+
 var_block =
     "var"
         var_definition_list
@@ -28,91 +28,91 @@ var_definition =
 
 var_declaration =
     var_type_spec ;
-    
+
 var_type_spec =
     nonempty_type ;
-    
+
 var_declarator =
     var_actual_declarator var_size_declarator [":" var_initializer_list] ;
-    
+
 var_actual_declarator =
     id ;
-    
+
 var_size_declarator =
     '[' [const] ']' ;
-    
+
 var_initializer_list =
     var_initializer {"," var_initializer} ;
-    
+
 var_initializer =
     const | const "::" const" ;
-    
+
 func_definition =
     "def" func_declaration func_declarator ":"
         [var_block]
         stmts
     "end" ;
-    
+
 func_declaration =
     func_type_spec ;
-    
+
 func_type_spec =
     empty_type | nonemptytype ;
-    
+
 func_declarator =
     func_actual_declarator ;
-    
+
 func_actual_declarator =
     id '(' parameter_list ')' ;
-    
+
 func_parameter_list =
-    func_parameter_declaration {func_parameter_declaration} ;
-    
+    func_parameter_declaration {"," func_parameter_declaration} ;
+
 func_parameter_declaration =
     var_declaration var_actual_declarator ;
-    
+
 func_body_block =
     "body"
         stmt_list
     "end" ;
-    
+
 nonempty_type =
     "byte" | "word" | "dword" ;
 
 empty_type =
     "void" ;
-    
+
 stmt_list =
     stmt {stmt} ;
-    
+
 stmt =
     expr_stmt | break_stmt | continue_stmt | next_stmt | return_stmt |
     if_stmt | while_stmt | for_stmt ;
 
 expr_stmt =
     expr ;
-    
+
 break_stmt =
     "break" ;
-    
+
 continue_stmt =
     "continue" ;
-    
+
 next_stmt =
     "next" ;
-    
+
 return_stmt =
     "ret" [expr];
-    
+
 if_stmt =
     "if" "(" expr ")" ":" stmts
     {"elseif" "(" expr ")" ":" stmts}
     ["else" ":" stmts]
     "end" ;
-    
+
 while_stmt =
     "while" "(" expr ")" ":" stmts ;
-    
+
 for_stmt =
     "for" "(" expr  ")" "(" expr  ")" "(" expr  ")" ":"
         stmts
@@ -122,37 +122,58 @@ expr =
     expr "+" term |
     expr "-" term |
     term ;
-    
+
 term =
     term "*" factor |
     term "/" factor |
     factor ;
-    
+
 factor =
     const | "(" expr ")" ;
-    
+
 const =
     int | sqstr| dqstr ;
 
 
-
 {* Tokens *}
-    
-name =
-    id ;
-    
-int =
-
-sqstring =
-
-dqstring =
-    
-    
-{* Atoms *}
 
 id =
     ( "_" | letter ) {"_" | digit | letter} ;
-    
-letter =
+
+int =
+    "true" | "false" ;
+
+sqstr =
+    "'" {any-visible-ascii-character | "\" any-visible-ascii-character "'"} ;
+
+dqstr =
+    '"' {any-visible-ascii-character | '\' any-visible-ascii-character '"'} ;
+
+
+{* Atoms *}
+
+bindigit =
+    "0" | "1" ;
+
+octdigit =
+    "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" ;
+
+decdigit =
+    digit ;
+
+hexdigit =
+    digit |
+    "A" | "B" | "C" | "D" | "E" | "F" |
+    "a" | "b" | "c" | "d" | "e" | "f" ;
 
 digit =
+    "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+
+letter =
+    "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" |
+    "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" |
+    "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
+    "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" ;
+
+any-visible-ascii-character =
+    ;
