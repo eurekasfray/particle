@@ -1,0 +1,87 @@
+// Opcodes
+
+// Stack (00-2F)
+#define O_PUSHBI    0x01
+#define O_PUSHWI    0x02
+#define O_PUSHDI    0x03
+#define O_PUSHSP    0x04
+#define O_PUSHFP    0x05
+#define O_POPBI     0x06
+#define O_POPWI     0x07
+#define O_POPDI     0x08
+#define O_DUPBI     0x09
+#define O_DUPWI     0x0a
+#define O_DUPDI     0x0b
+#define O_OVERBI    0x0c
+#define O_OVERWI    0x0d
+#define O_OVERDI    0x0e
+#define O_SWAPBI    0x0f
+#define O_SWAPWI    0x10
+#define O_SWAPDI    0x11
+#define O_ROLLBI    0x12
+#define O_ROLLWI    0x13
+#define O_ROLLDI    0x14
+#define O_ROTBI     0x15
+#define O_ROTWI     0x16
+#define O_ROTDI     0x17
+#define O_ROTCBI    0x18
+#define O_ROTCWI    0x19
+#define O_ROTCDI    0x1a
+
+// Memory (30-3F)
+#define O_LOADBI    0x30
+#define O_LOADWI    0x31
+#define O_LOADDI    0x32
+#define O_PULLBI    0x33
+#define O_PULLWI    0x34
+#define O_PULLDI    0x35
+
+// Jumps (40-5F)
+#define O_JMP       0x40
+#define O_JZ        0x41
+#define O_JNZ       0x42
+#define O_JE        0x43
+#define O_JNE       0x44
+#define O_CALL      0x45
+#define O_RET       0x46
+
+// Math (60-7F)
+#define O_ADDBI     0x60
+#define O_ADDWI     0x61
+#define O_ADDDI     0x62
+#define O_SUBBI     0x63
+#define O_SUBWI     0x64
+#define O_SUBDI     0x65
+#define O_MULBI     0x66
+#define O_MULWI     0x67
+#define O_MULDI     0x68
+#define O_DIVBI     0x69
+#define O_DIVWI     0x6a
+#define O_DIVDI     0x6b
+#define O_MODBI     0x6c
+#define O_MODWI     0x6d
+#define O_MODDI     0x6e
+
+// Bitwise (80-9F)
+#define O_ANDBI     0x80
+#define O_ANDWI     0x81
+#define O_ANDDI     0x82
+#define O_ORBI      0x83
+#define O_ORWI      0x84
+#define O_ORDI      0x85
+#define O_XORBI     0x86
+#define O_XORWI     0x87
+#define O_XORDI     0x88
+#define O_NOTBI     0x89
+#define O_NOTWI     0x8a
+#define O_NOTDI     0x8b
+#define O_SHLBI     0x8c
+#define O_SHLWI     0x8d
+#define O_SHLDI     0x8e
+#define O_SHRBI     0x8f
+#define O_SHRWI     0x90
+#define O_SHRDI     0x91
+
+// Machine (special)
+#define O_NOP       0x00
+#define O_HALT      0xFF
