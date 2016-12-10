@@ -1,0 +1,15 @@
+entry main
+
+@include 
+
+var
+    byte m[6]:
+        0 :: "Hello",
+        3 :: "p!",
+          :: 0
+    byte s[]: "Hi", @(dup ' ' 3), "there"
+end
+
+def byte main (byte argc, word argv)
+
+end
