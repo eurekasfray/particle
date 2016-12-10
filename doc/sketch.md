@@ -1,4 +1,4 @@
-# Particle spec
+# Particle language spec
 
 # Introduction
 
@@ -125,9 +125,6 @@ TBD
 
 * A *token* is a structure that represents a lexeme. A token provides the translator with basic information about its lexeme.
 
-<<<<<<< HEAD
-* The information a token provides shall include the following: 1) The *lexeme* which is a unit of characters that is collected during the lexical analysis phase. 2) The *type* which is a unique value that is used to classify a lexeme. 3) The *int value* which stores the evaluated integer value of the lexeme if the lexeme type is `t_int`. 4) The *string value* which stores the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
-=======
 * The information a token provides shall include the following: lexeme, type, int value, and string value.
 
   * The *lexeme* shall store the actual lexeme.
@@ -137,7 +134,6 @@ TBD
   * The *int value* shall store the evaluated integer value of the lexeme if the lexeme type is `t_int`.
 
   * The *string value* shall store the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
->>>>>>> fcedecadd144b1b35d6390a32b84c40252c9c271
 
 * Other information a token may provide includes the following: line number, and column number.
 
@@ -168,7 +164,7 @@ TBD
 
 ## Comments
 
-* A comment is initiated by the hash character (`#`) and is terminated by either the t_newline token or t_eof token.
+* A comment is initiated by the hash character (`#`) and is terminated by either the EOL character or EOF.
 
 * The translator shall not tokenize a comment. A comment is ignored entirely by the compiler. That is, the compiler ignores any sequence of characters that follows the hash character. The compiler does this until either a new line or the end of the file is met.
 
@@ -233,17 +229,43 @@ TBD
 
 ## Unary operators
 
-* The `$` operator shall return the size of its operand in bytes. The operand of this operator shall only be a variable. The evaluated result of this operation shall be a `word` value.
+* The size-of operator `$` shall return the size of its operand in bytes. The operand of this operator shall only be a variable. The evaluated result of this operation shall be a `word` value.
 
-* The `&` operator shall return the address of its operand as a `word`. The operand shall be an identifier.
+* The address-of operator `&` shall return the address of its operand as a `word`. The operand shall be an identifier.
 
-* The `*` operator shall treat its operand as an address and returns the value stored at the address. The operand shall be an expression.
+* The value-at operator `*` shall treat its operand as an address and returns the value stored at the address. The operand shall be an expression.
+
+* The logical negation operator `!` shall return 1 if its operand is 0; otherwise, it shall return 0 if its operand is a non-zero value.
+
+* The bitwise negation operator `~` shall flip the bits of its operand and return resulting value; if a bit is 0 it becomes 1 and if a bit is 1 it becomes 0.
+
+## Logical operators
+
+* The logical-equality operator`==`
+
+* The logical-inequality operator `!=`
+
+* The less-than operator `<`
+
+* The less-than-equal operator `<=`
+
+* The greater-than operator `>`
+
+* The greater-than-equal operator `>=`
+
+## Bitwise operators
+
+* The shift-left operator `<<`
+
+* The shift-right operator `>>`
+
+* The roll-left operator `<<<`
+
+* The roll-right operator `>>>`
 
 ## Literals
 
-* The integer literal `true` shall be interpreted as the integer value `1`.
-
-* The values `false` and `null` shall represent the integer values `0`. The `null` and `false` numerals is a representation for the integer value `0`. The `true` value numerals is a representation for the integer value `1`.
+* The integer literal `true` shall be interpreted as the integer value `1`. Whereas, the values `false` and `null` shall be interpreted as the integer value `0`.
 
 
 # Statements
