@@ -2,20 +2,11 @@
 #include "global.h"
 
 static int input;
+static FILE *srcfile;
 
 //==============================================================================
 // Accessors
 //==============================================================================
-
-void set_input(int val)
-{
-    input = val;
-}
-
-int get_input()
-{
-    return input;
-}
 
 //==============================================================================
 // Scanner
@@ -23,13 +14,9 @@ int get_input()
 
 // Create lexer
 
-struct lexer *init_lexer(FILE *srcfile)
+void init_lexer(FILE *f)
 {
-    struct lexer *p;
-    p = emalloc(sizeof(struct lexer));
-    p->input = 0;
-    p->srcfile = srcfile;
-    return p;
+    srcfile = f;
 }
 
 // Get next character from source file
@@ -47,7 +34,7 @@ int get_next_char(FILE *f)
 
 // Get next token
 
-struct token *get_next_token(struct lexer *lexer)
+struct token *get_next_token()
 {
     /*
     State transition table:
