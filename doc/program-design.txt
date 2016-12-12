@@ -19,8 +19,8 @@ Treat the compilaton unit as an object/component with properties and methods.
 Main component: handles data flow and program logic.
 
     open source file
-    pass file to Parser
-    (Parser returns pointer to generated object code)
+    pass file to the parser
+    parser returns pointer to generated object code
     store pointer to object code
     pass pointer to object code to VM
 
@@ -31,7 +31,7 @@ Parser component: check syntax correctness, do semantic check, and generate code
     - program()
     - ...
 
-Lexer component:
+Lexer component: generates token from source file.
     Tokenizer routine
     - get_next_token(): main interface for the tokenizer.
     Utility routines
@@ -56,7 +56,7 @@ ObjectCode: represents object code
     - void *data: stores binary data.
     - int len: stores length of object code in bytes.
     ADT
-    - objcode
+    - create_objcode(): creates new objcode struct.
     - emitb(byte data): writes a byte of data to `bin` and adds 1 to `len`.
     - emitw(word data): writes a word of data to `bin` and adds 2 to `len`.
     - emitd(dword data): writes a dword of data to `bin` and adds 4 to `len`.
