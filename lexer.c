@@ -1,6 +1,22 @@
 #include "lexer.h"
 #include "global.h"
 
+static int input;
+
+//==============================================================================
+// Accessors
+//==============================================================================
+
+void set_input(int val)
+{
+    input = val;
+}
+
+int get_input()
+{
+    return input;
+}
+
 //==============================================================================
 // Scanner
 //==============================================================================
@@ -170,7 +186,7 @@ struct token *get_next_token(struct lexer *lexer)
             // scanner:
             case S1:
                 if (is_whitespace(lexer->input)) {
-                    lexer->input = get_next_char(lexer->srcfile);
+                    lexer->input = get_next_char(get_input());
                     next_state = current_state;
                 }
                 else if (is_symbol(lexer->input)) {
