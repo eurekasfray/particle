@@ -14,7 +14,7 @@ Everything is a data structure, and API.
 Information is passed around in data structures.
 Components have a purpose and APIs so that other components can manipulate them.
 Data structures have APIs.
-Treat the compilaton unit as an object/component with properties and methods.
+Treat the compilaton unit as an object/component with properties and methods. Encapsulate the information inside the translation unit.
     
 Main component: handles data flow and program logic.
 
