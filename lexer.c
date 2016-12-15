@@ -1,47 +1,65 @@
 #include "lexer.h"
 #include "global.h"
 
-static int input;
-static FILE *srcfile;
+//==============================================================================
+// Properties
+//==============================================================================
+
+static int input;       // stores char read from source file
+static FILE *srcfile;   // points to the source file handle
 
 //==============================================================================
 // Accessors
 //==============================================================================
 
+// Set input
+
+void lexer_set_input(int c)
+{
+    input = c;
+}
+
+// Get input
+
+int lexer_get_input()
+{
+    return input;
+}
+
+// Set srcfile
+
+void lexer_set_srcfile(FILE *f)
+{
+    srcfile = f;
+}
+
+// Get srcfile
+
+FILE *lexer_get_srcfile()
+{
+    return srcfile;
+}
+
 //==============================================================================
 // Scanner
 //==============================================================================
 
-// Create lexer
+// Initialize the lexer
 
 void init_lexer(FILE *f)
 {
     srcfile = f;
 }
-
-// Get next character from source file
-
-int get_next_char(FILE *f)
-{
-    int c;
-
-    c = fgetc(f);
-    if (ferror(f)) {
-        fail("Unable to read character from source file.");
-    }
-    return c;
-}
-
 // Get next token
 
-struct token *get_next_token()
+Token *get_next_token()
 {
     /*
     State transition table:
 
     Tokenization rules:
-    * A string without a closing quotation mark is terminated by EOL or EOF
-    * A comment is terminated by EOL
+    * A string without a closing quotation mark is terminated by EOL or EOF.
+    * A comment is terminated by EOL.
 
     -------------   ------------------  ----------  ------------------------------------
     current state   input               next state  action
@@ -132,35 +150,35 @@ struct token *get_next_token()
     */
 
     typedef enum state {
-        S0,
-        S1,
-        S2,
-        S2_1,
-        S2_2,
-        S2_3,
-        S2_4,
-        S2_5,
-        S2_6,
-        S2_6_1,
-        S2_7,
-        S2_7_1,
-        S3,
-        S4,
-        S5,
-        S5_1,
-        S5_1_1,
-        S6,
-        S6_1,
-        S6_1_1,
-        S7,
-        S7_1,
-        S8
+        S0,     // State 0     ...
+        S1,     // State 1     ...
+        S2,     // State 2     ...    
+        S2_1,   // State 2.1   ...    
+        S2_2,   // State 2.2   ...
+        S2_3,   // State 2.3   ...
+        S2_4,   // State 2.4   ...
+        S2_5,   // State 2.5   ...
+        S2_6,   // State 2.6   ...
+        S2_6_1, // State 2.6.1 ...  
+        S2_7,   // State 2.7   ...  
+        S2_7_1, // State 2.7.1 ...  
+        S3,     // State 3     ...
+        S4,     // State 4     ...
+        S5,     // State 5     ...
+        S5_1,   // State 5.1   ...
+        S5_1_1, // State 5.1.1 ...
+        S6,     // State 6     ...
+        S6_1,   // State 6.1   ...  
+        S6_1_1, // State 6.1.1 ...
+        S7,     // State 7     ...
+        S7_1,   // State 7.1   ...  
+        S8      // State 8     ...
     } state;
 
     state next_state;
     state current_state;
-    bool done; // indicates the end of the tokenization process
-    struct token *token;
+    bool done;           // indicates the end of the tokenization process
+    Token *token;        // points to the generated token
 
     token = create_token();
     flush_lexeme(token);
@@ -172,26 +190,26 @@ struct token *get_next_token()
         switch (current_state) {
             // scanner:
             case S1:
-                if (is_whitespace(lexer->input)) {
-                    lexer->input = get_next_char(get_input());
+                if (is_whitespace(input)) {
+                    input = get_next_char();
                     next_state = current_state;
                 }
-                else if (is_symbol(lexer->input)) {
+                else if (is_symbol(input)) {
                     next_state = S2;
                 }
-                else if (is_eol(lexer->input)) {
+                else if (is_eol(input)) {
                     next_state = S3;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S4;
                 }
-                else if (is_sqmark(lexer->input)) {
+                else if (is_sqmark(input)) {
                     next_state = S5;
                 }
-                else if (is_dqmark(lexer->input)) {
+                else if (is_dqmark(input)) {
                     next_state = S6;
                 }
-                else if (is_comment_initiator(lexer->input)) {
+                else if (is_comment_initiator(input)) {
                     next_state = S7;
                 }
                 else {
@@ -199,51 +217,51 @@ struct token *get_next_token()
                 }
                 break;
             case S2:
-                if (lexer->input == ':') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == ':') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_1;
                 }
-                else if (lexer->input == '|') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '|') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_2;
                 }
-                else if (lexer->input == '&') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '&') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_3;
                 }
-                else if (lexer->input == '=') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '=') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_4;
                 }
-                else if (lexer->input == '!') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '!') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_5;
                 }
-                else if (lexer->input == '<') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '<') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_6;
                 }
-                else if (lexer->input == '>') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '>') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S_7;
                 }
-                else if (is_symbol(lexer->input)) {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (is_symbol(input)) {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 break;
             case S2_1:
-                if (lexer->input == ':') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == ':') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -251,9 +269,9 @@ struct token *get_next_token()
                 }
                 break;
             case S2_2:
-                if (lexer->input == '|') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '|') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -261,9 +279,9 @@ struct token *get_next_token()
                 }
                 break;
             case S2_3:
-                if (lexer->input == '&') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '&') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -271,9 +289,9 @@ struct token *get_next_token()
                 }
                 break;
             case S2_4:
-                if (lexer->input == '=') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '=') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -281,9 +299,9 @@ struct token *get_next_token()
                 }
                 break;
             case S2_5:
-                if (lexer->input == '=') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '=') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -291,23 +309,23 @@ struct token *get_next_token()
                 }
                 break;
             case S2_6:
-                if (lexer->input == '<') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '<') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S2_6_1;
                 }
-                else if (lexer->input == '=') }
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '=') }
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 else {
                     next_state = S0;
                 }
                 break;
             case S2_6_1:
-                if (lexer->input == '<') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '<') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -315,23 +333,23 @@ struct token *get_next_token()
                 }
                 break;
             case S2_7:
-                if (lexer->input == '>') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '>') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S2_6_1;
                 }
-                else if (lexer->input == '=') }
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                else if (input == '=') }
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 else {
                     next_state = S0;
                 }
                 break;
             case S2_7_1:
-                if (lexer->input == '>') {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (input == '>') {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
@@ -345,7 +363,7 @@ struct token *get_next_token()
                 push_to_lexeme(token,'O');
                 push_to_lexeme(token,'L');
                 push_to_lexeme(token,']');
-                lexer->input = get_next_char(lexer->srcfile);
+                input = get_next_char();
                 next_state = 0;
                 break;
             case S4:
@@ -355,100 +373,100 @@ struct token *get_next_token()
                 push_to_lexeme(token,'O');
                 push_to_lexeme(token,'F');
                 push_to_lexeme(token,']');
-                lexer->input = get_next_char(lexer->srcfile);
+                input = get_next_char();
                 next_state = 0;
                 break;
             case S5:
-                push_to_lexeme(token, lexer->input);
-                lexer->input = get_next_char(lexer->srcfile);
+                push_to_lexeme(token, input);
+                input = get_next_char();
                 next_state = S5_1;
                 break;
             case S5_1:
-                if (is_backslash(lexer->input)) {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (is_backslash(input)) {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S5_1_1;
                 }
-                else if (is_eol(lexer->input)) {
+                else if (is_eol(input)) {
                     next_state = S0;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S0;
                 }
-                else if (is_sqmark(lexer->input)) {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->input);
+                else if (is_sqmark(input)) {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->input);
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S5_1;
                 }
                 break;
             case S5_1_1:
-                if (is_eol(lexer->input)) {
+                if (is_eol(input)) {
                     next_state = S0;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->input);
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S5_1;
                 }
                 break;
             case S6:
-                push_to_lexeme(token, lexer->input);
-                lexer->input = get_next_char(lexer->srcfile);
+                push_to_lexeme(token, input);
+                input = get_next_char();
                 next_state = S6_1;
                 break;
             case S6_1:
-                if (is_backslash(lexer->input)) {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                if (is_backslash(input)) {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S6_1_1;
                 }
-                else if (is_eol(lexer->input)) {
+                else if (is_eol(input)) {
                     next_state = S0;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S0;
                 }
-                else if (is_dqmark(lexer->input)) {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->input);
+                else if (is_dqmark(input)) {
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->input);
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S6_1;
                 }
                 break;
             case S6_1_1:
-                if (is_eol(lexer->input)) {
+                if (is_eol(input)) {
                     next_state = S0;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->input);
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = S6_1;
                 }
                 break;
             case S7:
-                lexer->input = get_next_char(lexer->input);
+                input = get_next_char();
                 next_state = S7_1;
                 break;
             case S7_1:
-                if (is_eol(lexer->input)) {
+                if (is_eol(input)) {
                     next_state = S0;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S0;
                 }
                 else {
@@ -456,30 +474,30 @@ struct token *get_next_token()
                 }
                 break;
             case S8:
-                if (is_whitespace(lexer->input)) {
+                if (is_whitespace(input)) {
                     next_state = S0;
                 }
-                else if (is_symbol(lexer->input)) {
+                else if (is_symbol(input)) {
                     next_state = S0;
                 }
-                else if (is_eol(lexer->input)) {
+                else if (is_eol(input)) {
                     next_state = S0;
                 }
-                else if (is_eof(lexer->input)) {
+                else if (is_eof(input)) {
                     next_state = S0;
                 }
-                else if (is_sqmark(lexer->input)) {
+                else if (is_sqmark(input)) {
                     next_state = S0;
                 }
-                else if (is_dqmark(lexer->input)) {
+                else if (is_dqmark(input)) {
                     next_state = S0;
                 }
-                else if (is_comment_initiator(lexer->input)) {
+                else if (is_comment_initiator(input)) {
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, lexer->input);
-                    lexer->input = get_next_char(lexer->srcfile);
+                    push_to_lexeme(token, input);
+                    input = get_next_char();
                     next_state = current_state;
                 }
                 break;
@@ -487,7 +505,7 @@ struct token *get_next_token()
             case S0:
                 done = true;
                 if (token->eol) {
-                    token_type = t_eol;
+                    token->type = t_eol;
                 }
                 else if (token->eof) {
                     token->type = t_eof;
@@ -585,6 +603,18 @@ struct token *get_next_token()
                 else if (is_id(token->lexeme)) {
                     token->type = t_id;
                 }
+                else if (is_terminal("true", token->lexeme)) {
+                    token->type = t_int;
+                    token->intval = 1;
+                }
+                else if (is_terminal("false", token->lexeme)) {
+                    token->type = t_int;
+                    token->intval = 0;
+                }
+                else if (is_terminal("null", token->lexeme)) {
+                    token->type = t_int;
+                    token->intval = 0;
+                }
                 else if (is_bin(token->lexeme)) {
                     token->type = t_int;
                     token->intval = eval_bin(token->lexeme);
@@ -618,13 +648,27 @@ struct token *get_next_token()
     return token;
 }
 
+// Get next character from source file
+
+static int get_next_char()
+{
+    int c;
+
+    c = fgetc(srcfile);
+    if (ferror(srcfile)) {
+        fail("Unable to read character from source file");
+    }
+    return c;
+}
+
+
 //==============================================================================
 // Evaluators
 //==============================================================================
 
 // Evaluate binary
 
-int eval_bin(const char *s)
+static int eval_bin(const char *s)
 {
     // Remove appended symbol and evaluate binary number
     char *p;
@@ -635,7 +679,7 @@ int eval_bin(const char *s)
 
 // Evaluate octal
 
-int eval_oct(const char *s)
+static int eval_oct(const char *s)
 {
     // Remove appended symbol and evaluate octal number
     char *p;
@@ -646,7 +690,7 @@ int eval_oct(const char *s)
 
 // Evaluate decimal
 
-int eval_dec(const char *s)
+static int eval_dec(const char *s)
 {
     // Evaluate a decimal. Unlike the other numerical representations,
     // decimals are valid with or without the appended symbol. Check for
@@ -662,7 +706,7 @@ int eval_dec(const char *s)
 
 // Evaluate hexadecimal
 
-int eval_hex(const char *s)
+static int eval_hex(const char *s)
 {
     char *p;
     p = dupstr(s);
@@ -671,7 +715,8 @@ int eval_hex(const char *s)
 }
 
 // Evaluators
-int eval(const char *s, int base)
+
+static int eval(const char *s, int base)
 {
     int i;       // loop counter
     int val;     // store integer value of digit
@@ -695,7 +740,7 @@ int eval(const char *s, int base)
 
 // Lookup digit value
 
-int eval_digit(int c)
+static int eval_digit(int c)
 {
     // Get the value of any digit. To do this, we use a lookup table,
     // a simple character array. This array is a map. Each digit (array element)
@@ -717,7 +762,7 @@ int eval_digit(int c)
 
 // Evaluate single-quote string
 
-char *eval_sqstr(char *s)
+static char *eval_sqstr(char *s)
 {
     // Simple string. Only remove quotation marks.
     char *p;
@@ -726,7 +771,8 @@ char *eval_sqstr(char *s)
 }
 
 // Evaluate double-quote string
-char *eval_dqstr(char *s)
+
+static char *eval_dqstr(char *s)
 {
     return eval_sqstr(s);
 }
@@ -739,7 +785,7 @@ char *eval_dqstr(char *s)
 
 // Match token lexeme to terminal
 
-bool is_terminal(const char *terminal, const char *token)
+static bool is_terminal(const char *terminal, const char *token)
 {
     if (strcmp(terminal,token) == 0) {
         return true;
@@ -751,7 +797,7 @@ bool is_terminal(const char *terminal, const char *token)
 
 // Recognize identifier
 
-book is_id(const char *s)
+static book is_id(const char *s)
 {
     int current_state;
     int next_state;
@@ -799,7 +845,7 @@ book is_id(const char *s)
 
 // Recognize any integer representation
 
-bool is_int(const char *s)
+static bool is_int(const char *s)
 {
     if (is_bin(s) || is_oct(s) || is_dec(s) || is_hex(s)) {
         return true;
@@ -809,7 +855,7 @@ bool is_int(const char *s)
 
 // Recognize binary numerals
 
-bool is_bin(const char *s)
+static bool is_bin(const char *s)
 {
     int current_state;
     int next_state;
@@ -866,7 +912,7 @@ bool is_bin(const char *s)
 
 // Recognize octal numeral
 
-bool is_oct(const char *s)
+static bool is_oct(const char *s)
 {
     int current_state;
     int next_state;
@@ -922,7 +968,7 @@ bool is_oct(const char *s)
 
 // Recognize decimal numeral
 
-bool is_dec(const char *s)
+static bool is_dec(const char *s)
 {
     int current_state;
     int next_state;
@@ -981,7 +1027,7 @@ bool is_dec(const char *s)
 
 // Recognize hexadecimal numeral
 
-bool is_hex(const char *s)
+static bool is_hex(const char *s)
 {
     int current_state;
     int next_state;
@@ -1038,7 +1084,7 @@ bool is_hex(const char *s)
 
 // Recognize single-quote string
 
-bool is_sqstr(const char *s)
+static bool is_sqstr(const char *s)
 {
     int current_state;
     int next_state;
@@ -1108,7 +1154,7 @@ bool is_sqstr(const char *s)
 
 // Recognize double-quote string
 
-bool is_dqstr(const char *s)
+static bool is_dqstr(const char *s)
 {
     int current_state;
     int next_state;
@@ -1180,7 +1226,7 @@ bool is_dqstr(const char *s)
 
 // Recognize binary digit
 
-bool is_bindigit(int c)
+static bool is_bindigit(int c)
 {
     if (c == '0' || c == '1') {
         return true;
@@ -1190,7 +1236,7 @@ bool is_bindigit(int c)
 
 // Recognize octal digit
 
-bool is_octdigit(int c)
+static bool is_octdigit(int c)
 {
     if (is_digit(c) && (c < '8')) {
         return true;
@@ -1200,7 +1246,7 @@ bool is_octdigit(int c)
 
 // Recognize decimal digit
 
-bool is_decdigit(int c)
+static bool is_decdigit(int c)
 {
     if (is_digit(c)) {
         return true;
@@ -1210,7 +1256,7 @@ bool is_decdigit(int c)
 
 // Recognize hexadecimal digit
 
-bool is_hexdigit(int c)
+static bool is_hexdigit(int c)
 {
     if (is_digit(c)) {
         return true;
@@ -1223,7 +1269,7 @@ bool is_hexdigit(int c)
 
 // Recognize digit
 
-bool is_digit(int c)
+static bool is_digit(int c)
 {
     if (c >= '0' && c <= '9') {
         return true;
@@ -1233,7 +1279,7 @@ bool is_digit(int c)
 
 // Recognize letter
 
-bool is_letter(int c)
+static bool is_letter(int c)
 {
     c = lowercase(c);
     if (c >= 'a' && c <= 'z') {
@@ -1244,7 +1290,7 @@ bool is_letter(int c)
 
 // Recognize any visible ASCII character
 
-bool is_visible_ascii_character(int c)
+static bool is_visible_ascii_character(int c)
 {
     // Visible ASCII characters run a value range of 32 - 126
     if (c >= 32 && c <= 126) {
@@ -1260,7 +1306,7 @@ bool is_visible_ascii_character(int c)
 
 // Recognize end-of-string character
 
-bool is_eos(int c)
+static bool is_eos(int c)
 {
     if (c == '\0') {
         return true;
@@ -1270,7 +1316,7 @@ bool is_eos(int c)
 
 // Recognize end-of-line character
 
-bool is_eol(int c)
+static bool is_eol(int c)
 {
     if (c == '\n') {
         return true;
@@ -1280,7 +1326,7 @@ bool is_eol(int c)
 
 // Recognize end-of-file indicator
 
-bool is_eof(int c)
+static bool is_eof(int c)
 {
     if (c == EOF) {
         return true;
@@ -1290,7 +1336,7 @@ bool is_eof(int c)
 
 // Recognize binary notation symbol
 
-bool is_binsym(int c)
+static bool is_binsym(int c)
 {
     if (lowercase(c) == 'b') {
         return true;
@@ -1300,7 +1346,7 @@ bool is_binsym(int c)
 
 // Recognize octal notation symbol
 
-bool is_octsym(int c)
+static bool is_octsym(int c)
 {
     if (lowercase(c) == 'o') {
         return true;
@@ -1310,7 +1356,7 @@ bool is_octsym(int c)
 
 // Recognize decimal notation symbol
 
-bool is_decsym(int c)
+static bool is_decsym(int c)
 {
     if (lowercase(c) == 'd') {
         return true;
@@ -1320,7 +1366,7 @@ bool is_decsym(int c)
 
 // Recognize hexadecimal notation symbol
 
-bool is_hexsym(int c)
+static bool is_hexsym(int c)
 {
     if (lowercase(c) == 'h') {
         return true;
@@ -1330,7 +1376,7 @@ bool is_hexsym(int c)
 
 // Recognize comment initiator
 
-bool is_comment_initiator(int c)
+static bool is_comment_initiator(int c)
 {
     if (c == '#') {
         return true;
@@ -1340,7 +1386,7 @@ bool is_comment_initiator(int c)
 
 // Recognize underscore character
 
-bool is_underscore(int c)
+static bool is_underscore(int c)
 {
     if (c == '_') {
         return true;
@@ -1350,7 +1396,7 @@ bool is_underscore(int c)
 
 // Recognize single quotation mark
 
-bool is_sqmark(int c)
+static bool is_sqmark(int c)
 {
     if (c == '\'') {
         return true;
@@ -1360,7 +1406,7 @@ bool is_sqmark(int c)
 
 // Recognize double quotation mark
 
-bool is_dqmark(int c)
+static bool is_dqmark(int c)
 {
     if (c == '"') {
         return true;
@@ -1370,7 +1416,7 @@ bool is_dqmark(int c)
 
 // Recognize backslash or escape sequence initiator
 
-bool is_backslash(int c)
+static bool is_backslash(int c)
 {
     if (c == '\\') {
         return true;
@@ -1380,7 +1426,7 @@ bool is_backslash(int c)
 
 // Recognize a symbol
 
-bool is_symbol(int c)
+static bool is_symbol(int c)
 {
     switch (c) {
         case '+':
@@ -1413,7 +1459,7 @@ bool is_symbol(int c)
 
 // Recognize whitespace
 
-bool is_whitespace(int c)
+static bool is_whitespace(int c)
 {
     // All non-visible ASCII characters except NEWLINE are considered whitespace.
     if (!is_visible_ascii_character(c) && !is_eol(c)) {

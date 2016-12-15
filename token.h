@@ -57,19 +57,19 @@ typedef enum token_type {
     t_newline,          //
     t_eof,              //
     t_unknown           //
-} token_type;
+} TokenType;
 
 // Token
 
-struct token {
+typedef struct token {
     char lexeme[TOKEN_LEXEME_SIZE]; // string that's treated like a stack; it stores the lexeme captured from source
     int top;          // used by stack operations; points to top of lexeme
     bool eol;         // special flag used to represent an EOL token
     bool eof;         // also a special flag that represents the EOF token
-    token_type type;  // token type
+    TokenType type;   // token type
     int intval;       // store evaluated value of an integer literal
     char *strval      // store evaluated value of a string literal
-};
+} Token;
 
 // Token operations
 

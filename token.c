@@ -1,11 +1,12 @@
 #include "token.h"
 
 // Create new token
+
 struct token *create_token()
 {
     struct token *p;
 
-    p = emalloc(sizeof(struct token));
+    p = emalloc(sizeof(Token));
     p->eol = false;
     p->eof = false;
 
@@ -14,7 +15,7 @@ struct token *create_token()
 
 // Push character to lexeme
 
-void push_to_lexeme(struct token *p, int c)
+void push_to_lexeme(Token *p, int c)
 {
     if (p->top == TOKEN_LEXEME_SIZE) {
         fail("Overflow occurred on lexeme stack");
@@ -25,7 +26,7 @@ void push_to_lexeme(struct token *p, int c)
 
 // Pop character from lexeme
 
-int pop_from_lexeme(struct token *p)
+int pop_from_lexeme(Token *p)
 {
     int c;
 
@@ -41,7 +42,7 @@ int pop_from_lexeme(struct token *p)
 
 // Flush lexeme
 
-void flush_lexeme(struct token *p)
+void flush_lexeme(Token *p)
 {
     p->top = 0;
     p->lexeme[p->top] = '\0';
