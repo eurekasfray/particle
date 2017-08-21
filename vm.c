@@ -79,6 +79,10 @@ static char mem[MEMORY_SIZE];
 // CPU FSM states
 
 typedef enum CpuState {
+    // instructions
+    I_NOP = OC_NOP,
+    I_HALT = OC_HALT,
+
     // CPU fetch-decode-execute sequence
     S_INIT,
     S_FETCH,
@@ -86,11 +90,7 @@ typedef enum CpuState {
     S_COUNTER_INCREMENT,
 
     // error
-    E_UNKNOWN_INSTRUCTION,
-
-    // instructions
-    I_NOP = OC_NOP,
-    I_HALT = OC_HALT
+    E_UNKNOWN_INSTRUCTION
 } CpuState;
 
 // Error
