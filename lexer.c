@@ -1,72 +1,128 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <string.h>
+#include "globals.h"
+#include "error.h"
 #include "lexer.h"
-#include "global.h"
+#include "token.h"
+#include "input.h"
+#include "debug.h"
+#include "utils.h"
 
-//==============================================================================
-// Properties
-//==============================================================================
+// Evaluators
+static int eval_bin(const char *);
+static int eval_oct(const char *);
+static int eval_dec(const char *);
+static int eval_hex(const char *);
+static int eval(const char *, int);
+static int eval_digit(int);
+static char *eval_dqstr(char *);
+static char *eval_sqstr(char *);
 
-static int input;       // stores char read from source file
-static FILE *srcfile;   // points to the source file handle
+// Terminal recognizer
+static bool is_terminal(const char *, const char *);
 
-//==============================================================================
-// Accessors
-//==============================================================================
+// Token recognizers
+static bool is_id(const char *);
+static bool is_int(const char *);
+static bool is_bin(const char *);
+static bool is_oct(const char *);
+static bool is_dec(const char *);
+static bool is_hex(const char *);
+static bool is_sqstr(const char *);
+static bool is_dqstr(const char *);
 
-// Set input
+// Atom recognizers
+static bool is_bindigit(int);
+static bool is_octdigit(int);
+static bool is_decdigit(int);
+static bool is_hexdigit(int);
+static bool is_digit(int);
+static bool is_letter(int);
+static bool is_visible_ascii_character(int);
 
-void lexer_set_input(int c)
-{
-    input = c;
-}
-
-// Get input
-
-int lexer_get_input()
-{
-    return input;
-}
-
-// Set srcfile
-
-void lexer_set_srcfile(FILE *f)
-{
-    srcfile = f;
-}
-
-// Get srcfile
-
-FILE *lexer_get_srcfile()
-{
-    return srcfile;
-}
+// Atom helper recognizers
+static bool is_space(int);
+static bool is_eos(int);
+static bool is_eol(int);
+static bool is_eof(int);
+static bool is_binsym(int);
+static bool is_octsym(int);
+static bool is_decsym(int);
+static bool is_hexsym(int);
+static bool is_comment_initiator(int);
+static bool is_underscore(int);
+static bool is_sqmark(int);
+static bool is_dqmark(int);
+static bool is_backslash(int);
+static bool is_symbol(int);
+static bool is_whitespace(int);
 
 //==============================================================================
 // Scanner
 //==============================================================================
 
-// Initialize the lexer
+// Create lexer
 
-void init_lexer(FILE *f)
+Lexer *lexer_create()
 {
-    srcfile = f;
+    Lexer *ptr;
+    ptr = emalloc(sizeof(*ptr));
+    return ptr;
 }
-// Get next token
 
-Token *get_next_token()
+// Get next character from source file
+//
+// \param Lexer lexer: The lexer context
+// \return
+Input *lexer_next_char(Lexer *lexer)
+{
+
+    int c;
+    Input *input;
+
+
+    input = input_create();
+
+
+    input->c = file_getc(lexer->file);
+
+
+    if (ferror(lexer->file->handle)) {
+
+        fail("Unable to read character from source file.");
+    }
+
+
+    input->file = lexer->file;
+    input->colno = lexer->file->colno;
+    input->lineno = lexer->file->lineno;
+
+    return input;
+}
+
+// Get next token (greedy tokenizer)
+//
+// \param Lexer lexer:    The lexer context
+// \param bool using_eol: If TRUE the T_EOL token is scanned for; otherwise
+//                        the T_EOF is not scanned for
+Token *lexer_next_token(Lexer *lexer, bool using_eol)
 {
     /*
     State transition table:
 
     Tokenization rules:
-    * A string without a closing quotation mark is terminated by EOL or EOF.
-    * A comment is terminated by EOL.
+    * A string without a closing quotation mark is terminated by EOL or EOF
+    * A comment is terminated by EOL
 
     -------------   ------------------  ----------  ------------------------------------
     current state   input               next state  action
     -------------   ------------------  ----------  ------------------------------------
     1               whitespace          1           ignore input; get next input
     1               symbol              2           do nothing
-    1               eol                 3           do nothing
+    1               eol && using_eol    3           do nothing
+    1               eol && !using eol   1           ignore input; get next input
     1               eof                 4           do nothing
     1               sqmark              5           do nothing
     1               dqmark              6           do nothing
@@ -86,6 +142,7 @@ Token *get_next_token()
     2               "["                 0           push input to lexeme; get next input
     2               "]"                 0           push input to lexeme; get next input
     2               "^"                 0           push input to lexeme; get next input
+    2               ";"                 0           push input to lexeme; get next input
     2               ":"                 2.1         push input to lexeme; get next input
     2               "|"                 2.2         push input to lexeme; get next input
     2               "&"                 2.3         push input to lexeme; get next input
@@ -134,8 +191,8 @@ Token *get_next_token()
     6.1.1           eof                 0           do nothing
     6.1.1           anything else       6.1         push input to lexeme; get next input
     7               comment initiator   7.1         ignore input; get next input
-    7.1             eol                 0           do nothing
-    7.1             eof                 0           do nothing
+    7.1             eol                 1           do nothing
+    7.1             eof                 1           do nothing
     7.1             anything else       7.1         ignore input; get next input
     8               whitespace          0           do nothing
     8               symbol              0           do nothing
@@ -145,123 +202,148 @@ Token *get_next_token()
     8               dqmark              0           do nothing
     8               comment initiator   0           do nothing
     8               anything else       8           push input to lexeme; get next input
-    0               lexeme              -           ...
+    0               lexeme              -           tokenize and evaluate
     -------------   ------------------  ----------  ------------------------------------
     */
 
-    typedef enum state {
-        S0,     // State 0     ...
-        S1,     // State 1     ...
-        S2,     // State 2     ...    
-        S2_1,   // State 2.1   ...    
-        S2_2,   // State 2.2   ...
-        S2_3,   // State 2.3   ...
-        S2_4,   // State 2.4   ...
-        S2_5,   // State 2.5   ...
-        S2_6,   // State 2.6   ...
-        S2_6_1, // State 2.6.1 ...  
-        S2_7,   // State 2.7   ...  
-        S2_7_1, // State 2.7.1 ...  
-        S3,     // State 3     ...
-        S4,     // State 4     ...
-        S5,     // State 5     ...
-        S5_1,   // State 5.1   ...
-        S5_1_1, // State 5.1.1 ...
-        S6,     // State 6     ...
-        S6_1,   // State 6.1   ...  
-        S6_1_1, // State 6.1.1 ...
-        S7,     // State 7     ...
-        S7_1,   // State 7.1   ...  
-        S8      // State 8     ...
-    } state;
+    enum State {
+        S0,
+        S1,
+        S2,
+        S2_1,
+        S2_2,
+        S2_3,
+        S2_4,
+        S2_5,
+        S2_6,
+        S2_6_1,
+        S2_7,
+        S2_7_1,
+        S3,
+        S4,
+        S5,
+        S5_1,
+        S5_1_1,
+        S6,
+        S6_1,
+        S6_1_1,
+        S7,
+        S7_1,
+        S8
+    };
 
-    state next_state;
-    state current_state;
-    bool done;           // indicates the end of the tokenization process
-    Token *token;        // points to the generated token
+    enum State next_state;
+    enum State current_state;
+    bool done; // indicates the end of the tokenization process
+    Token *token; // stores the token to return
 
-    token = create_token();
-    flush_lexeme(token);
+
+    token = token_create();
+
+    token_flush_lexeme(token);
     done = false;
     next_state = S1;
 
     while (!done) {
+
+
         current_state = next_state;
         switch (current_state) {
-            // scanner:
+            // Scanner
             case S1:
-                if (is_whitespace(input)) {
-                    input = get_next_char();
+                if (is_whitespace(lexer->input->c)) {
+                    lexer->input = lexer_next_char(lexer);
                     next_state = current_state;
                 }
-                else if (is_symbol(input)) {
+                else if (is_symbol(lexer->input->c)) {
+                    token->lineno = lexer->input->lineno; // store the location where the token was encountered
+                    token->colno = lexer->input->colno; //   to the token, for the compiler to display
                     next_state = S2;
                 }
-                else if (is_eol(input)) {
+                // if we are using EOL lets process it
+                else if (using_eol && is_eol(lexer->input->c)) {
+
+                    token->lineno = lexer->input->lineno;
+                    token->colno = lexer->input->colno;
                     next_state = S3;
                 }
-                else if (is_eof(input)) {
+                // if we are not using EOL then treat the EOL like whitespace and skip over it
+                else if (!using_eol && is_eol(lexer->input->c)) {
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = current_state;
+                }
+                else if (is_eof(lexer->input->c)) {
+                    token->lineno = lexer->input->lineno;
+                    token->colno = lexer->input->colno;
                     next_state = S4;
                 }
-                else if (is_sqmark(input)) {
+                else if (is_sqmark(lexer->input->c)) {
+                    token->lineno = lexer->input->lineno;
+                    token->colno = lexer->input->colno;
                     next_state = S5;
                 }
-                else if (is_dqmark(input)) {
+                else if (is_dqmark(lexer->input->c)) {
+                    token->lineno = lexer->input->lineno;
+                    token->colno = lexer->input->colno;
                     next_state = S6;
                 }
-                else if (is_comment_initiator(input)) {
+                else if (is_comment_initiator(lexer->input->c)) {
                     next_state = S7;
                 }
                 else {
+                    token->lineno = lexer->input->lineno;
+                    token->colno = lexer->input->colno;
                     next_state = S8;
                 }
                 break;
             case S2:
-                if (input == ':') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_1;
+                // Check for first character of a digraph symbol below
+                if (lexer->input->c == ':') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_1;
                 }
-                else if (input == '|') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_2;
+                else if (lexer->input->c == '|') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_2;
                 }
-                else if (input == '&') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_3;
+                else if (lexer->input->c == '&') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_3;
                 }
-                else if (input == '=') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_4;
+                else if (lexer->input->c == '=') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_4;
                 }
-                else if (input == '!') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_5;
+                else if (lexer->input->c == '!') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_5;
                 }
-                else if (input == '<') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_6;
+                else if (lexer->input->c == '<') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_6;
                 }
-                else if (input == '>') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
-                    next_state = S_7;
+                else if (lexer->input->c == '>') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
+                    next_state = S2_7;
                 }
-                else if (is_symbol(input)) {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                // Check for regular symbol below
+                else if (is_symbol(lexer->input->c)) {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 break;
             case S2_1:
-                if (input == ':') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == ':') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -269,9 +351,9 @@ Token *get_next_token()
                 }
                 break;
             case S2_2:
-                if (input == '|') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '|') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -279,9 +361,9 @@ Token *get_next_token()
                 }
                 break;
             case S2_3:
-                if (input == '&') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '&') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -289,9 +371,9 @@ Token *get_next_token()
                 }
                 break;
             case S2_4:
-                if (input == '=') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '=') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -299,9 +381,9 @@ Token *get_next_token()
                 }
                 break;
             case S2_5:
-                if (input == '=') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '=') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -309,23 +391,24 @@ Token *get_next_token()
                 }
                 break;
             case S2_6:
-                if (input == '<') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '<') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S2_6_1;
                 }
-                else if (input == '=') }
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                else if (lexer->input->c == '=') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
+                }
                 else {
                     next_state = S0;
                 }
                 break;
             case S2_6_1:
-                if (input == '<') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '<') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -333,23 +416,24 @@ Token *get_next_token()
                 }
                 break;
             case S2_7:
-                if (input == '>') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '>') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S2_6_1;
                 }
-                else if (input == '=') }
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                else if (lexer->input->c == '=') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
+                }
                 else {
                     next_state = S0;
                 }
                 break;
             case S2_7_1:
-                if (input == '>') {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (lexer->input->c == '>') {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
@@ -358,146 +442,146 @@ Token *get_next_token()
                 break;
             case S3:
                 token->eol = true;
-                push_to_lexeme(token,'[');
-                push_to_lexeme(token,'E');
-                push_to_lexeme(token,'O');
-                push_to_lexeme(token,'L');
-                push_to_lexeme(token,']');
-                input = get_next_char();
-                next_state = 0;
+                token_push_to_lexeme(token,'[');
+                token_push_to_lexeme(token,'E');
+                token_push_to_lexeme(token,'O');
+                token_push_to_lexeme(token,'L');
+                token_push_to_lexeme(token,']');
+                lexer->input = lexer_next_char(lexer);
+                next_state = S0;
                 break;
             case S4:
                 token->eof = true;
-                push_to_lexeme(token,'[');
-                push_to_lexeme(token,'E');
-                push_to_lexeme(token,'O');
-                push_to_lexeme(token,'F');
-                push_to_lexeme(token,']');
-                input = get_next_char();
-                next_state = 0;
+                token_push_to_lexeme(token,'[');
+                token_push_to_lexeme(token,'E');
+                token_push_to_lexeme(token,'O');
+                token_push_to_lexeme(token,'F');
+                token_push_to_lexeme(token,']');
+                next_state = S0;
                 break;
             case S5:
-                push_to_lexeme(token, input);
-                input = get_next_char();
+                token_push_to_lexeme(token, lexer->input->c);
+                lexer->input = lexer_next_char(lexer);
                 next_state = S5_1;
                 break;
             case S5_1:
-                if (is_backslash(input)) {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (is_backslash(lexer->input->c)) {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S5_1_1;
                 }
-                else if (is_eol(input)) {
+                else if (is_eol(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_eof(input)) {
+                else if (is_eof(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_sqmark(input)) {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                else if (is_sqmark(lexer->input->c)) {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S5_1;
                 }
                 break;
             case S5_1_1:
-                if (is_eol(input)) {
+                if (is_eol(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_eof(input)) {
+                else if (is_eof(lexer->input->c)) {
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S5_1;
                 }
                 break;
             case S6:
-                push_to_lexeme(token, input);
-                input = get_next_char();
+                token_push_to_lexeme(token, lexer->input->c);
+                lexer->input = lexer_next_char(lexer);
                 next_state = S6_1;
                 break;
             case S6_1:
-                if (is_backslash(input)) {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                if (is_backslash(lexer->input->c)) {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S6_1_1;
                 }
-                else if (is_eol(input)) {
+                else if (is_eol(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_eof(input)) {
+                else if (is_eof(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_dqmark(input)) {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                else if (is_dqmark(lexer->input->c)) {
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S6_1;
                 }
                 break;
             case S6_1_1:
-                if (is_eol(input)) {
+                if (is_eol(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_eof(input)) {
+                else if (is_eof(lexer->input->c)) {
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = S6_1;
                 }
                 break;
             case S7:
-                input = get_next_char();
+                lexer->input = lexer_next_char(lexer);
                 next_state = S7_1;
                 break;
             case S7_1:
-                if (is_eol(input)) {
-                    next_state = S0;
+                if (is_eol(lexer->input->c)) {
+                    next_state = S1;
                 }
-                else if (is_eof(input)) {
-                    next_state = S0;
+                else if (is_eof(lexer->input->c)) {
+                    next_state = S1;
                 }
                 else {
+                    lexer->input = lexer_next_char(lexer);
                     next_state = current_state;
                 }
                 break;
             case S8:
-                if (is_whitespace(input)) {
+                if (is_whitespace(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_symbol(input)) {
+                else if (is_symbol(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_eol(input)) {
+                else if (is_eol(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_eof(input)) {
+                else if (is_eof(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_sqmark(input)) {
+                else if (is_sqmark(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_dqmark(input)) {
+                else if (is_dqmark(lexer->input->c)) {
                     next_state = S0;
                 }
-                else if (is_comment_initiator(input)) {
+                else if (is_comment_initiator(lexer->input->c)) {
                     next_state = S0;
                 }
                 else {
-                    push_to_lexeme(token, input);
-                    input = get_next_char();
+                    token_push_to_lexeme(token, lexer->input->c);
+                    lexer->input = lexer_next_char(lexer);
                     next_state = current_state;
                 }
                 break;
@@ -552,6 +636,9 @@ Token *get_next_token()
                 else if (is_terminal("^", token->lexeme)) {
                     token->type = t_bitwise_xor_op;
                 }
+                else if (is_terminal(";", token->lexeme)) {
+                    token->type = t_semicolon;
+                }
                 else if (is_terminal(":", token->lexeme)) {
                     token->type = t_colon;
                 }
@@ -559,7 +646,7 @@ Token *get_next_token()
                     token->type = t_base_op;
                 }
                 else if (is_terminal("|", token->lexeme)) {
-                    token->type = t_bitwise_or_op
+                    token->type = t_bitwise_or_op;
                 }
                 else if (is_terminal("||", token->lexeme)) {
                     token->type = t_logical_or_op;
@@ -574,7 +661,7 @@ Token *get_next_token()
                     token->type = t_assign_op;
                 }
                 else if (is_terminal("==", token->lexeme)) {
-                    token->type = t_eq_op
+                    token->type = t_eq_op;
                 }
                 else if (is_terminal("!", token->lexeme)) {
                     token->type = t_logical_neg_op;
@@ -600,20 +687,89 @@ Token *get_next_token()
                 else if (is_terminal(">>>", token->lexeme)) {
                     token->type = t_bitwise_ror_op;
                 }
-                else if (is_id(token->lexeme)) {
-                    token->type = t_id;
+                else if (is_terminal("entry", token->lexeme)) {
+                    token->type = t_entry;
                 }
-                else if (is_terminal("true", token->lexeme)) {
-                    token->type = t_int;
-                    token->intval = 1;
+                else if (is_terminal("def", token->lexeme)) {
+                    token->type = t_def;
                 }
-                else if (is_terminal("false", token->lexeme)) {
-                    token->type = t_int;
-                    token->intval = 0;
+                else if (is_terminal("enddef", token->lexeme)) {
+                    token->type = t_enddef;
+                }
+                else if (is_terminal("var", token->lexeme)) {
+                    token->type = t_var;
+                }
+                else if (is_terminal("endvar", token->lexeme)) {
+                    token->type = t_endvar;
+                }
+                else if (is_terminal("body", token->lexeme)) {
+                    token->type = t_body;
+                }
+                else if (is_terminal("end", token->lexeme)) {
+                    token->type = t_end;
+                }
+                else if (is_terminal("void", token->lexeme)) {
+                    token->type = t_void;
+                }
+                else if (is_terminal("byte", token->lexeme)) {
+                    token->type = t_byte;
+                }
+                else if (is_terminal("word", token->lexeme)) {
+                    token->type = t_word;
+                }
+                else if (is_terminal("dword", token->lexeme)) {
+                    token->type = t_dword;
                 }
                 else if (is_terminal("null", token->lexeme)) {
-                    token->type = t_int;
-                    token->intval = 0;
+                    token->type = t_null;
+                }
+                else if (is_terminal("false", token->lexeme)) {
+                    token->type = t_false;
+                }
+                else if (is_terminal("true", token->lexeme)) {
+                    token->type = t_true;
+                }
+                else if (is_terminal("break", token->lexeme)) {
+                    token->type = t_break;
+                }
+                else if (is_terminal("continue", token->lexeme)) {
+                    token->type = t_continue;
+                }
+                else if (is_terminal("next", token->lexeme)) {
+                    token->type = t_next;
+                }
+                else if (is_terminal("ret", token->lexeme)) {
+                    token->type = t_ret;
+                }
+                else if (is_terminal("if", token->lexeme)) {
+                    token->type = t_if;
+                }
+                else if (is_terminal("endif", token->lexeme)) {
+                    token->type = t_endif;
+                }
+                else if (is_terminal("else", token->lexeme)) {
+                    token->type = t_else;
+                }
+                else if (is_terminal("elseif", token->lexeme)) {
+                    token->type = t_elseif;
+                }
+                else if (is_terminal("endif", token->lexeme)) {
+                    token->type = t_endif;
+                }
+                else if (is_terminal("while", token->lexeme)) {
+                    token->type = t_while;
+                }
+                else if (is_terminal("endwhile", token->lexeme)) {
+                    token->type = t_endwhile;
+                }
+                else if (is_terminal("for", token->lexeme)) {
+                    token->type = t_for;
+                }
+                else if (is_terminal("endfor", token->lexeme)) {
+                    token->type = t_endfor;
+                }
+                else if (is_id(token->lexeme)) {
+                    token->type = t_id;
                 }
                 else if (is_bin(token->lexeme)) {
                     token->type = t_int;
@@ -633,11 +789,11 @@ Token *get_next_token()
                 }
                 else if (is_sqstr(token->lexeme)) {
                     token->type = t_sqstr;
-                    token->intval = eval_sqstr(token->lexeme);
+                    token->strval = eval_sqstr(token->lexeme);
                 }
                 else if (is_dqstr(token->lexeme)) {
-                    token->type = t_sqstr;
-                    token->intval = eval_dqstr(token->lexeme);
+                    token->type = t_dqstr;
+                    token->strval = eval_dqstr(token->lexeme);
                 }
                 else {
                     token->type = t_unknown;
@@ -647,20 +803,6 @@ Token *get_next_token()
     }
     return token;
 }
-
-// Get next character from source file
-
-static int get_next_char()
-{
-    int c;
-
-    c = fgetc(srcfile);
-    if (ferror(srcfile)) {
-        fail("Unable to read character from source file");
-    }
-    return c;
-}
-
 
 //==============================================================================
 // Evaluators
@@ -715,7 +857,6 @@ static int eval_hex(const char *s)
 }
 
 // Evaluators
-
 static int eval(const char *s, int base)
 {
     int i;       // loop counter
@@ -748,9 +889,10 @@ static int eval_digit(int c)
 
     int i; // indexer
     char d[] = "0123456789abcdef"; // table map
+    int dlen = strlen(d); // stores the string length
 
     // Search table for digit and returns its corresponding integer value
-    for (i=0; i<strlen(d); i++) {
+    for (i=0; i<dlen; i++) {
         if (lowercase(c) == d[i]) {
             return i;
         }
@@ -766,12 +908,11 @@ static char *eval_sqstr(char *s)
 {
     // Simple string. Only remove quotation marks.
     char *p;
-    p = substr(s+1,strlen(s)-2);
+    p = (char*)substr(s+1,strlen(s)-2);
     return p;
 }
 
 // Evaluate double-quote string
-
 static char *eval_dqstr(char *s)
 {
     return eval_sqstr(s);
@@ -797,7 +938,7 @@ static bool is_terminal(const char *terminal, const char *token)
 
 // Recognize identifier
 
-static book is_id(const char *s)
+static bool is_id(const char *s)
 {
     int current_state;
     int next_state;
@@ -811,7 +952,7 @@ static book is_id(const char *s)
         c = s[i++];
         current_state = next_state;
         switch (current_state) {
-            case 0;
+            case 0:
                 // Invalid
                 return false;
             case 1:
@@ -978,7 +1119,7 @@ static bool is_dec(const char *s)
     i = 0;
     next_state = 2;
 
-    while (true)) {
+    while (true) {
         c = s[i++];
         current_state = next_state;
         switch (current_state) {
@@ -1114,10 +1255,10 @@ static bool is_sqstr(const char *s)
                 }
                 break;
             case 3:
-                // Accept any visible ASCII character, except for the
+                // Accept any visible ASCII character and the space character, except for the
                 // single-quotation mark; or accept the backslash character;
                 // or accept closing single-quotation mark. Deny anything else.
-                if (is_visible_ascii_character(c) && c != '\'') {
+                if ((is_visible_ascii_character(c) || is_space(c)) && !is_sqmark(c)) {
                     next_state = current_state;
                 }
                 else if (is_backslash(c)) {
@@ -1184,10 +1325,10 @@ static bool is_dqstr(const char *s)
                 }
                 break;
             case 3:
-                // Accept any visible ASCII character except for the
+                // Accept any visible ASCII character and the space character, except for the
                 // double-quotation mark; or accept the backslash character;
                 // or accept closing double-quotation mark. Deny anything else.
-                if (is_visible_ascii_character(c) && c != '"') {
+                if ((is_visible_ascii_character(c) || is_space(c)) && !is_dqmark(c)) {
                     next_state = current_state;
                 }
                 else if (is_backslash(c)) {
@@ -1293,7 +1434,7 @@ static bool is_letter(int c)
 static bool is_visible_ascii_character(int c)
 {
     // Visible ASCII characters run a value range of 32 - 126
-    if (c >= 32 && c <= 126) {
+    if (c > 32 && c < 127) {
         return true;
     }
     return false;
@@ -1303,6 +1444,16 @@ static bool is_visible_ascii_character(int c)
 //
 // These recognizers assist in recognition and are not explicitly
 // part of the grammar.
+
+// Recognize space character
+
+static bool is_space(int c)
+{
+    if (c == ' ') {
+        return true;
+    }
+    return false;
+}
 
 // Recognize end-of-string character
 
@@ -1328,6 +1479,7 @@ static bool is_eol(int c)
 
 static bool is_eof(int c)
 {
+
     if (c == EOF) {
         return true;
     }
@@ -1435,7 +1587,6 @@ static bool is_symbol(int c)
         case '/':
         case '%':
         case '$':
-        case '&':
         case '~':
         case ',':
         case '(':
@@ -1443,6 +1594,7 @@ static bool is_symbol(int c)
         case '[':
         case ']':
         case '^':
+        case ';':
         case ':':
         case '|':
         case '&':
@@ -1461,8 +1613,20 @@ static bool is_symbol(int c)
 
 static bool is_whitespace(int c)
 {
-    // All non-visible ASCII characters except NEWLINE are considered whitespace.
-    if (!is_visible_ascii_character(c) && !is_eol(c)) {
+    // The translator considers whitespace to be any non-ASCII character.
+    // When checking for whitespace, this recognizer denies any character
+    // that is not a visible ASCII character, not the the EOF indicator,
+    // and not the EOL character.
+    //
+    // We specially include a check for the EOF and EOL because we if check
+    // for visible ASCII characters only, then the EOF and EOL will be
+    // implicitly considered whitespace. With the EOF, its value does not
+    // fall in the range of visible ASCII characters. It will therefore be
+    // seen as whitespace. Also with the EOL, its value falls within the
+    // the range of non-visible ASCII characters. It will also be seen
+    // as whitetspace. The exceptions applied by this recognizer allow
+    // these two characters to be overlooked as whitespaces.
+    if (!is_visible_ascii_character(c) && !is_eof(c) &&!is_eol(c)) {
         return true;
     }
 }

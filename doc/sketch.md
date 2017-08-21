@@ -123,17 +123,17 @@ TBD
 
 * A *lexeme* is a unit of characters that is collected during the lexical analysis phase.
 
-* A *token* is a structure that represents a lexeme. A token provides the translator with basic information about its lexeme.
+* A *token* is a data structure that represents a lexeme. A token stores properties about a lexeme, and provides the translator with information about a lexeme.
 
 * The information a token provides shall include the following: lexeme, type, int value, and string value.
 
-  * The *lexeme* shall store the actual lexeme.
+  * *lexeme:* shall store the actual lexeme.
 
-  * The *type* shall store a unique value that represents the meaning of the lexeme. The unique value is used to define what the lexeme means.
+  * *type:* shall store a unique value that represents the meaning of the lexeme.
 
-  * The *int value* shall store the evaluated integer value of the lexeme if the lexeme type is `t_int`.
+  * *int value:* shall store the evaluated integer value of the lexeme if the lexeme type is `T_INT`.
 
-  * The *string value* shall store the evaluated value of a string literal if the token type is either `t_dqstr` or `t_sqstr`.
+  * *string value:* shall store the evaluated value of a string literal if the token type is either `T_DQSTR` or `T_SQSTR`.
 
 * Other information a token may provide includes the following: line number, and column number.
 
@@ -265,7 +265,7 @@ TBD
 
 ## Literals
 
-* The integer literal `true` shall be interpreted as the integer value `1`. Whereas, the values `false` and `null` shall be interpreted as the integer value `0`.
+* The integer literal `true` shall be interpreted as the integer value `1`; and the values `false` and `null` shall be interpreted as the integer value `0`.
 
 
 # Statements

@@ -1,0 +1,24 @@
+{**
+ * The grammar for the Particle assembler
+ *
+ * This grammar uses the token production rules of the Particle language since
+ * they both use the same lexer.
+ *
+ * Format: Written in EBNF
+ *}
+
+{* Defines an assembly program that contains a sequence of lines. The program allows for multiple lines and empty line terminated by EOL, *}
+program =
+    {linen} EOF ;
+
+{* Defines a line that can be empty an line terminated by EOL)*}
+linen =
+    EOL | line EOL ;
+
+{* Defines a line that allows only a label, only an instruction, or both a label and instruction *}
+line =
+    id (":" [id [const]] | const) ;
+
+{* Defines a constant *}
+const =
+    id | int | sqstr | dqstr ;

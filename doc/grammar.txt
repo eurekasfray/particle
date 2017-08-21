@@ -1,6 +1,8 @@
 {**
- * Written in EBNF
- * Date: 2015/11/07
+ * The grammar for Particle
+ *
+ * Format: Written in EBNF
+ * Date: 2017/01/21
  *}
 
 keywords =
@@ -27,9 +29,9 @@ var_definition =
     var_declaration var_declarator ;
 
 var_declaration =
-    var_type_spec ;
+    var_type_specifier ;
 
-var_type_spec =
+var_type_specifier =
     nonempty_type ;
 
 var_declarator =
@@ -50,14 +52,14 @@ var_initializer =
 func_definition =
     "def" func_declaration func_declarator ":"
         [var_block]
-        stmts
-    "end" ;
+        stmt_list
+    "enddef" ;
 
 func_declaration =
-    func_type_spec ;
+    func_type_specifier ;
 
-func_type_spec =
-    empty_type | nonemptytype ;
+func_type_specifier =
+    empty_type | nonempty_type ;
 
 func_declarator =
     func_actual_declarator ;
@@ -69,7 +71,7 @@ func_parameter_list =
     func_parameter_declaration {"," func_parameter_declaration} ;
 
 func_parameter_declaration =
-    var_declaration var_actual_declarator ;
+    empty_type | var_declaration var_actual_declarator ;
 
 func_body_block =
     "body"
@@ -83,7 +85,7 @@ empty_type =
     "void" ;
 
 stmt_list =
-    stmt {stmt} ;
+    {stmt} ;
 
 stmt =
     expr_stmt | break_stmt | continue_stmt | next_stmt | return_stmt |
@@ -106,17 +108,19 @@ return_stmt =
 
 if_stmt =
     "if" "(" expr ")" ":" stmts
-    {"elseif" "(" expr ")" ":" stmts}
-    ["else" ":" stmts]
-    "end" ;
+    {"elseif" "(" expr ")" ":" stmt_lists}
+    ["else" ":" stmt_list]
+    "endif" ;
 
 while_stmt =
-    "while" "(" expr ")" ":" stmts ;
+    "while" "(" expr ")" ":"
+        stmt_lists
+    "endwhile";
 
 for_stmt =
-    "for" "(" expr  ")" "(" expr  ")" "(" expr  ")" ":"
-        stmts
-    "end" ;
+    "for" "(" expr ";" expr ";" expr ")" ":"
+        stmt_list
+    "endfor" ;
 
 expr =
     expr "+" term |
@@ -129,7 +133,7 @@ term =
     factor ;
 
 factor =
-    const | "(" expr ")" ;
+    id | const | "(" expr ")" ;
 
 const =
     int | sqstr| dqstr ;
@@ -144,10 +148,10 @@ int =
     "true" | "false" ;
 
 sqstr =
-    "'" {any-visible-ascii-character | "\" any-visible-ascii-character "'"} ;
+    "'" {any-visible-ascii-character | " " | "\" any-visible-ascii-character "'"} ;
 
 dqstr =
-    '"' {any-visible-ascii-character | '\' any-visible-ascii-character '"'} ;
+    '"' {any-visible-ascii-character | " " | '\' any-visible-ascii-character '"'} ;
 
 
 {* Atoms *}
